@@ -69,6 +69,9 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Sensors\AccelerometerHandler.cs" />
+    <Compile Include="Sensors\HeartRateSensorHandler.cs" />
+    <Compile Include="Sensors\AudioRecorder.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
