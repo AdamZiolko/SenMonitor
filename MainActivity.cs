@@ -13,9 +13,12 @@ namespace SenMonitor
     public class MainActivity : Activity
     {
         private SensorManager _sensorManager;
+        private DatabaseManager _databaseManager;
+
         private TextView _accelerometerDataTextView;
         private TextView _volumeLevelTextView;
         private TextView _heartRateTextView; // Deklaracja TextView dla tętna
+        private TextView _daneZBazy;
         private AccelerometerHandler _accelerometerHandler;
         private AudioRecorder _audioRecorder;
         private HeartRateSensorHandler _heartRateSensorHandler; // Dodanie obsługi czujnika tętna
@@ -26,6 +29,8 @@ namespace SenMonitor
             SetContentView(Resource.Layout.activity_main);
 
             _sensorManager = (SensorManager)GetSystemService(SensorService);
+            _databaseManager = new DatabaseManager(this);
+
             _accelerometerDataTextView = FindViewById<TextView>(Resource.Id.accelerometerDataTextView);
             _volumeLevelTextView = FindViewById<TextView>(Resource.Id.volumeLevelTextView);
             _heartRateTextView = FindViewById<TextView>(Resource.Id.txtHeartRate); // Inicjalizacja TextView dla tętna
@@ -33,6 +38,15 @@ namespace SenMonitor
             _accelerometerHandler = new AccelerometerHandler(_sensorManager, _accelerometerDataTextView);
             _audioRecorder = new AudioRecorder(_volumeLevelTextView);
             _heartRateSensorHandler = new HeartRateSensorHandler(_sensorManager, _heartRateTextView); // Inicjalizacja obsługi czujnika tętna
+
+            //////////////// Baza danych ///////////////////////////////////////////////////////////////////////////////////////////////
+            string dataToSave = "Twoje dane do zapisania";
+            _databaseManager.InsertSensorData(dataToSave);
+            _databaseManager.InsertSensorData("Dane z bazy danych");
+            string latestData = _databaseManager.GetLatestSensorData();
+            _daneZBazy = FindViewById<TextView>(Resource.Id.daneZBazy);
+            _daneZBazy.Text = latestData;
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         }
 
         protected override void OnResume()

@@ -69,6 +69,8 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Database\DatabaseHelper.cs" />
+    <Compile Include="Database\DatabaseManager.cs" />
     <Compile Include="Sensors\AccelerometerHandler.cs" />
     <Compile Include="Sensors\HeartRateSensorHandler.cs" />
     <Compile Include="Sensors\AudioRecorder.cs" />
@@ -107,7 +109,9 @@
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_launcher_foreground.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\ic_launcher_round.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\tlo1.png" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MPAndroidChart">
       <Version>3.1.0</Version>
