@@ -27,6 +27,15 @@
         android:layout_centerHorizontal="true"
         android:textColor="#FFFFFF"
         android:text="Ekran Dodawania Snu" />
+    
+    <Button 
+android:id="@+id/saveButton"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_below="@+id/heightTextView"
+android:layout_centerHorizontal="true"
+android:layout_marginTop="360dp"
+android:text="Zapisz" /> Zmienić wygląd stosowny do aplikacji
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/navigation"
