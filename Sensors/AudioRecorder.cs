@@ -73,6 +73,6 @@ public class AudioRecorder
 
     private void DisplayVolumeLevel(double volumeLevel)
     {
-        _volumeLevelTextView.Text = $"Volume Level: {Math.Round(volumeLevel, 3)}";
+        _volumeLevelTextView.Text = $"Volume Level: {volumeLevel}";
     }
 }
