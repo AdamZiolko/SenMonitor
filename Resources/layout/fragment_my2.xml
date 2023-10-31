@@ -21,17 +21,28 @@
         android:id="@+id/message2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="140dp"
+        android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true"
-        android:textSize="18dp"
+        android:textSize="15dp"
         android:textStyle="bold"  
         android:textColor="#FFFFFF"
         android:text="Ekran Raportów" />
 
+     <Button 
+android:id="@+id/saveButton"
+android:layout_width="70dp"
+android:layout_height="30dp"
+android:layout_below="@+id/heightTextView"
+android:layout_centerHorizontal="true"
+android:layout_marginTop="190dp"
+android:textSize="7dp"        
+android:text="Powrót" /> //Zmienić wygląd stosowny do aplikacji
+
+    
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/navigation"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:layout_marginEnd="0dp"
         android:layout_marginStart="0dp"
         android:background="?android:attr/windowBackground"
