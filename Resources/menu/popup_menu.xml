@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	  	android:id="@+id/navigation"
+>
+	<item
+        android:id="@+id/navigation_home"
+    android:layout_width="200dp"
+
+        android:title="Home"
+		android:background="#FF0000" />
+	<item
+        android:id="@+id/navigation_page2"
+        android:title="Page 2" 
+		    android:layout_width="200dp"
+/>
+	<item
+        android:id="@+id/navigation_page3"
+        android:title="Page 3"
+		    android:layout_width="200dp"
+/>
+	<item
+		android:id="@+id/navigation_page4"
+		android:title="Page 41"
+		android:background="#FF0000"
+		    android:layout_width="200dp"
+/>
+	<item
+		android:id="@+id/navigation_page5"
+		android:title="Page 5"
+		    android:layout_width="200dp"
+/>
+</menu>
+

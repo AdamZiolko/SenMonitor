@@ -10,4 +10,34 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+	<style name="PopupMenuStyle" parent="Widget.AppCompat.PopupMenu">
+		<!-- Ustal tło PopupMenu na jasny żółty kolor (#FFFF00) -->
+		<item name="android:popupBackground">#FFFF00</item>
+		<item name="android:layout_width">5dp</item>
+
+		<!-- Ustal cień wokół PopupMenu na dużą wartość -->
+		<item name="android:popupElevation">17dp</item>
+
+		<!-- Ustal niestandardową animację otwierania i zamykania PopupMenu (możesz dostosować własną animację) -->
+		<item name="android:popupAnimationStyle">@anim/custom_popup_animation</item>
+
+		<!-- Dostosuj położenie w poziomie PopupMenu -->
+
+		<!-- Dostosuj położenie w pionie PopupMenu -->
+		<item name="android:dropDownWidth">33dp</item>
+		<!-- Określ, żeby PopupMenu nie nachodziło na element otwierający -->
+		<item name="android:overlapAnchor">false</item>
+
+		<!-- Dostosuj wewnętrzny padding PopupMenu -->
+		<item name="android:padding">16dp</item>
+
+		<!-- Ustal szerokość PopupMenu na stałą wartość (np. 100dp) -->
+
+		<!-- Określ, że okno PopupMenu ma być przezroczyste -->
+
+
+	</style>
+
+
+
 </resources>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:columnCount="2"
+    android:background="#FFFFFF"
+    >
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select an option:"
+        android:layout_gravity="center"
+        android:padding="8dp"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/navigation_home"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Home"
+        android:layout_gravity="center"
+        android:padding="8dp" />
+
+    <Button
+        android:id="@+id/navigation_page2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Page 2"
+        android:layout_gravity="center"
+        android:padding="8dp" />
+
+    <Button
+        android:id="@+id/navigation_page3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Page 3"
+        android:layout_gravity="center"
+        android:padding="8dp" />
+
+    <Button
+        android:id="@+id/navigation_page4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Page 4"
+        android:layout_gravity="center"
+        android:padding="8dp" />
+
+    <Button
+        android:id="@+id/navigation_page5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Page 5"
+        android:layout_gravity="center"
+        android:padding="8dp" />
+
+    <!-- Dodaj przyciski dla innych opcji -->
+
+</GridLayout>
