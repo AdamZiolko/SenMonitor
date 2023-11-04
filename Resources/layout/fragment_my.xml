@@ -36,7 +36,7 @@ android:layout_below="@+id/heightTextView"
 android:layout_centerHorizontal="true"
 android:layout_marginTop="190dp"
 android:textSize="7dp"        
-android:text="Zapisz" /> Zmienić wygląd stosowny do aplikacji
+android:text="Zapisz" /> //Zmienić wygląd stosowny do aplikacji
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/navigation"
