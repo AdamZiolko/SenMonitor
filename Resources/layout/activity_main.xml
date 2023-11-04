@@ -16,7 +16,7 @@
         android:src="@drawable/tlo1"
         android:scaleType="centerInside"
         android:layout_centerInParent="true"
-        android:layout_margin="1dp"
+        android:layout_margin="0dp"
     />
     <TextView
         android:id="@id/message2"
@@ -70,14 +70,12 @@
             android:textStyle="bold"
         />
 
-         
-
-        
     </LinearLayout>
+
         <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/navigation"
         android:layout_width="wrap_content"
-        android:layout_height="20dp"
+        android:layout_height="60dp"
         android:layout_marginEnd="0dp"
         android:layout_marginStart="0dp"
         android:background="?android:attr/windowBackground"

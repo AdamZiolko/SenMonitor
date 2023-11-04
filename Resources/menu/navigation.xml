@@ -2,7 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
 	  	android:id="@+id/navigation"
 >
-
 	<item
         android:id="@+id/navigation_home"
         android:title="Home" />
@@ -12,5 +11,11 @@
 	<item
         android:id="@+id/navigation_page3"
         android:title="Page 3" />
+	<item
+		android:id="@+id/navigation_page4"
+		android:title="Page 4" />
+	<item
+		android:id="@+id/navigation_page5"
+		android:title="Page 5" />
 </menu>
 

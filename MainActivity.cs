@@ -10,6 +10,7 @@ using AndroidX.Fragment.App;
 using Google.Android.Material.BottomNavigation;
 using System;
 using AndroidX.AppCompat.App;
+using Android.Content.Res;
 
 namespace SenMonitor
 {
@@ -60,7 +61,6 @@ namespace SenMonitor
 
             BottomNavigationView navigation = FindViewById<BottomNavigationView>(Resource.Id.navigation);
             navigation.SetOnNavigationItemSelectedListener(this);
-
         }
 
         protected override void OnResume()
@@ -97,12 +97,30 @@ namespace SenMonitor
             {
                 case Resource.Id.navigation_home:
                     SupportFragmentManager.PopBackStack(null, (int)Android.App.PopBackStackFlags.Inclusive);
+                    
+
+                    Console.WriteLine("kliknięto navigation home");
+
                     break;
                 case Resource.Id.navigation_page2:
                     selectedFragment = new Page2Fragment(); // Utwórz odpowiedni fragment
+                    Console.WriteLine("kliknięto navigation home2");
+
                     break;
                 case Resource.Id.navigation_page3:
                     selectedFragment = new Page3Fragment(); // Utwórz odpowiedni fragment
+                    Console.WriteLine("kliknięto navigation home3");
+
+                    break;
+                case Resource.Id.navigation_page4:
+                    selectedFragment = new Page4Fragment(); // Utwórz odpowiedni fragment
+                    Console.WriteLine("kliknięto navigation home3");
+
+                    break;
+                case Resource.Id.navigation_page5:
+                    selectedFragment = new Page5Fragment(); // Utwórz odpowiedni fragment
+                    Console.WriteLine("kliknięto navigation home3");
+
                     break;
             }
 
@@ -135,6 +153,22 @@ namespace SenMonitor
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             return inflater.Inflate(Resource.Layout.fragment_my2, container, false);
+        }
+    }
+
+    public class Page4Fragment : AndroidX.Fragment.App.Fragment
+    {
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
+            return inflater.Inflate(Resource.Layout.fragment_my3, container, false);
+        }
+    }
+
+    public class Page5Fragment : AndroidX.Fragment.App.Fragment
+    {
+        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+        {
+            return inflater.Inflate(Resource.Layout.fragment_my4, container, false);
         }
     }
 }
