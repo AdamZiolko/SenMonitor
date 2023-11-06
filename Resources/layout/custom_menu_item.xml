@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select an option:"
+        android:text="Wybierz stronę:"
         android:layout_gravity="center"
         android:padding="8dp"
         android:textSize="16sp" />
@@ -19,41 +19,46 @@
         android:id="@+id/navigation_home"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Home"
+        android:text="Strona główna"
         android:layout_gravity="center"
-        android:padding="8dp" />
+        android:padding="8dp"
+        android:textSize="10dp" />
 
     <Button
         android:id="@+id/navigation_page2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Page 2"
+        android:text="Dodaj sen"
         android:layout_gravity="center"
-        android:padding="8dp" />
+        android:padding="8dp"
+        android:textSize="10dp" />
 
     <Button
         android:id="@+id/navigation_page3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Page 3"
+        android:text="Raporty"
         android:layout_gravity="center"
-        android:padding="8dp" />
+        android:padding="8dp" 
+        android:textSize="10dp" />
 
     <Button
         android:id="@+id/navigation_page4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Page 4"
+        android:text="Statystyki"
         android:layout_gravity="center"
-        android:padding="8dp" />
+        android:padding="8dp"
+        android:textSize="10dp"/>
 
     <Button
         android:id="@+id/navigation_page5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Page 5"
+        android:text="Ustawienia"
         android:layout_gravity="center"
-        android:padding="8dp" />
+        android:padding="8dp" 
+        android:textSize="10dp"/>
 
     <!-- Dodaj przyciski dla innych opcji -->
 
