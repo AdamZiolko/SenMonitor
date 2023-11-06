@@ -12,9 +12,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:text="Wybierz stronę:"
+        android:text="Wybierz:"
         android:layout_gravity="center"
-        android:padding="8dp"
+        android:padding="6dp"
+                android:layout_margin="2dp"
+
         android:textSize="16sp" />
 
     <Button
@@ -23,8 +25,11 @@
         android:layout_height="wrap_content"
         android:text="Główna"
         android:layout_gravity="center"
-        android:padding="8dp"
-        android:textSize="10dp" />
+        android:padding="6dp"
+                android:layout_margin="2dp"
+
+        android:textSize="10dp"
+/>
 
     <Button
         android:id="@+id/navigation_page2"
@@ -32,8 +37,11 @@
         android:layout_height="wrap_content"
         android:text="Dodaj sen"
         android:layout_gravity="center"
-        android:padding="8dp"
-        android:textSize="10dp" />
+        android:padding="6dp"
+                android:layout_margin="2dp"
+
+        android:textSize="10dp" 
+/>
 
     <Button
         android:id="@+id/navigation_page3"
@@ -41,8 +49,11 @@
         android:layout_height="wrap_content"
         android:text="Raporty"
         android:layout_gravity="center"
-        android:padding="8dp" 
-        android:textSize="10dp" />
+        android:padding="6dp" 
+                android:layout_margin="2dp"
+
+        android:textSize="10dp"
+/>
 
     <Button
         android:id="@+id/navigation_page4"
@@ -50,8 +61,11 @@
         android:layout_height="wrap_content"
         android:text="Statystyki"
         android:layout_gravity="center"
-        android:padding="8dp"
-        android:textSize="10dp"/>
+        android:padding="6dp"
+                android:layout_margin="2dp"
+
+        android:textSize="10dp"
+/>
 
     <Button
         android:id="@+id/navigation_page5"
@@ -59,9 +73,14 @@
         android:layout_height="wrap_content"
         android:text="Ustawienia"
         android:layout_gravity="center"
-        android:padding="8dp" 
-        android:textSize="10dp"/>
+        android:padding="6dp" 
+        android:textSize="10dp"
+        android:layout_margin="2dp"
+/>
 
     <!-- Dodaj przyciski dla innych opcji -->
 
 </GridLayout>
+
+
+
