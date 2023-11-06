@@ -12,6 +12,7 @@ using System;
 using AndroidX.AppCompat.App;
 using Android.Content.Res;
 using Google.Android.Material.FloatingActionButton;
+using Android.Views.Animations;
 
 namespace SenMonitor
 {
@@ -68,89 +69,108 @@ namespace SenMonitor
 
 
 
+            SetupFloatingActionButtonMenu();
+
+
+        }
+
+        private void SetupFloatingActionButtonMenu()
+        {
             var fab = FindViewById<FloatingActionButton>(Resource.Id.fab);
             bool isMenuOpen = false; // Zmienna śledząca stan menu
 
 
             fab.Click += (sender, e) =>
             {
+                Console.WriteLine(_heartRateTextView.Text);
+
+                fab.Animate().Alpha(0.0f).SetDuration(300);
                 if (!isMenuOpen) // Jeśli menu jest zamknięte
                 { // Ładuj niestandardowy widok z menu XML
                     View popupView = LayoutInflater.Inflate(Resource.Layout.custom_menu_item, null);
-                PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
-
-                
+                    PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
 
 
+                    int[] location = new int[2];
+                    fab.GetLocationOnScreen(location);
+                    int x = location[0] - popupWindow.Width; // Wyśrodkuj w poziomie
+                    int y = location[1] - popupWindow.Height; // Przesuń menu w górę
+                    Console.WriteLine(location[0]);
+                    popupWindow.ShowAtLocation(fab, GravityFlags.CenterHorizontal, 0, -60);
 
-                // Pobierz środek przycisku FloatingActionButton
-                int[] location = new int[2];
-                fab.GetLocationOnScreen(location);
-                int x = location[0] - popupWindow.Width; // Wyśrodkuj w poziomie
-                int y = location[1] - popupWindow.Height; // Przesuń menu w górę
-                Console.WriteLine(location[0]);
-                popupWindow.ShowAtLocation(fab, GravityFlags.NoGravity, 20, 100);
+                    // Przygotowanie popupView do animacji początkowej
+                    popupView.Alpha = 0.0f;
+                    popupView.ScaleX = 0.0f; // Skalowanie X na zero
+                    popupView.ScaleY = 0.0f; // Skalowanie Y na zero
+                    popupView.TranslationX = x;
+                    popupView.TranslationY = -y; // Przesunięcie na początek bliżej środka ekranu
 
-                popupView.Alpha = 0.0f;
-                popupView.ScaleX = 0.5f;
-                popupView.ScaleY = 0.5f;
-                popupView.TranslationX = x;
-                popupView.TranslationY = y;
-                popupView.Animate()
-                    .Alpha(1.0f)
-                    .ScaleX(1.0f)
-                    .ScaleY(1.0f)
-                    .TranslationX(0)
-                    .TranslationY(0)
-                    .SetDuration(300);
+                    // Ustawienie punktu odniesienia (pivot point) w środku popupView
+                    popupView.PivotX = 0;
+                    popupView.PivotY = popupView.Height / 2;
 
-                // Obsługa kliknięcia opcji
-                popupView.FindViewById(Resource.Id.navigation_home).Click += (s, args) =>
-                {
-                    SupportFragmentManager.PopBackStack(null, (int)Android.App.PopBackStackFlags.Inclusive);
-                    Console.WriteLine("Kliknięto navigation home");
-                    popupWindow.Dismiss();
-                    isMenuOpen = false;
-                };
+                    // Rozpoczęcie animacji
+                    var animator = popupView.Animate();
+                    animator.Alpha(1.0f)
+                            .ScaleX(1.0f)
+                            .ScaleY(1.0f)
+                            .TranslationX(0)
+                            .TranslationY(0)
+                            .SetDuration(500); // Wydłuż czas trwania animacji na 1 sekundę
 
-                // Obsługa innych opcji podobnie jak powyżej
-                popupView.FindViewById(Resource.Id.navigation_page2).Click += (s, args) =>
-                {
-                    ShowFragment(new Page2Fragment());
-                    popupWindow.Dismiss();
-                    isMenuOpen = false;
+                    // Dodanie efektu spowolnienia (jedno odbicie)
+                    animator.SetInterpolator(new DecelerateInterpolator());
 
-                };
+                    // Obsługa kliknięcia opcji
+                    popupView.FindViewById(Resource.Id.navigation_home).Click += (s, args) =>
+                    {
+                        SupportFragmentManager.PopBackStack(null, (int)Android.App.PopBackStackFlags.Inclusive);
+                        popupWindow.Dismiss();
+                        fab.Animate().Alpha(1.0f).SetDuration(300);
+                        isMenuOpen = false;
+                    };
 
-                popupView.FindViewById(Resource.Id.navigation_page3).Click += (s, args) =>
-                {
-                    ShowFragment(new Page3Fragment());
-                    popupWindow.Dismiss();
-                    isMenuOpen = false;
+                    // Obsługa innych opcji podobnie jak powyżej
+                    popupView.FindViewById(Resource.Id.navigation_page2).Click += (s, args) =>
+                    {
+                        ShowFragment(new Page2Fragment());
+                        popupWindow.Dismiss();
+                        fab.Animate().Alpha(1.0f).SetDuration(300);
+                        isMenuOpen = false;
 
-                };
+                    };
 
-                popupView.FindViewById(Resource.Id.navigation_page4).Click += (s, args) =>
-                {
-                    ShowFragment(new Page4Fragment());
-                    popupWindow.Dismiss();
-                    isMenuOpen = false;
-                };
+                    popupView.FindViewById(Resource.Id.navigation_page3).Click += (s, args) =>
+                    {
+                        ShowFragment(new Page3Fragment());
+                        popupWindow.Dismiss();
+                        fab.Animate().Alpha(1.0f).SetDuration(300);
+                        isMenuOpen = false;
+                    };
 
-                popupView.FindViewById(Resource.Id.navigation_page5).Click += (s, args) =>
-                {
-                    ShowFragment(new Page5Fragment());
-                    popupWindow.Dismiss();
-                    isMenuOpen = false;
-                };
+                    popupView.FindViewById(Resource.Id.navigation_page4).Click += (s, args) =>
+                    {
+                        ShowFragment(new Page4Fragment());
+                        popupWindow.Dismiss();
+                        fab.Animate().Alpha(1.0f).SetDuration(300);
+                        isMenuOpen = false;
+                    };
 
-                // Obsługa zamykania PopupWindow po kliknięciu w inne miejsce
-                Window.DecorView.RootView.Click += (s, args) =>
-                {
-                    popupWindow.Dismiss();
-                };
-                isMenuOpen = true;
-            }
+                    popupView.FindViewById(Resource.Id.navigation_page5).Click += (s, args) =>
+                    {
+                        ShowFragment(new Page5Fragment());
+                        popupWindow.Dismiss();
+                        fab.Animate().Alpha(1.0f).SetDuration(300);
+                        isMenuOpen = false;
+                    };
+
+                    // Obsługa zamykania PopupWindow po kliknięciu w inne miejsce
+                    Window.DecorView.RootView.Click += (s, args) =>
+                    {
+                        popupWindow.Dismiss();
+                    };
+                    isMenuOpen = true;
+                }
             };
 
             void ShowFragment(AndroidX.Fragment.App.Fragment fragment)
@@ -165,6 +185,7 @@ namespace SenMonitor
                 }
             }
         }
+
 
         protected override void OnResume()
         {
