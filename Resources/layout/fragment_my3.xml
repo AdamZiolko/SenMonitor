@@ -24,7 +24,9 @@
         android:orientation="vertical"
         android:gravity="center">
         
-        <TextView
+        
+    </LinearLayout>
+    <TextView
             android:id="@+id/message2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -33,18 +35,16 @@
             android:textStyle="bold"   
             android:layout_centerHorizontal="true"
             android:textColor="#FFFFFF"
-            android:text="Ekran Statystyk" />
+            android:text="Statystyki" />
         <Button 
             android:id="@+id/saveButton"
             android:layout_width="70dp"
             android:layout_height="30dp"
             android:layout_below="@+id/heightTextView"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="0dp"
+            android:layout_marginTop="180dp"
             android:textSize="7dp"        
             android:text="Powrót" />
-    </LinearLayout>
-
     
 
 </RelativeLayout>
