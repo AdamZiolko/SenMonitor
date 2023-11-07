@@ -13,6 +13,7 @@ using AndroidX.AppCompat.App;
 using Android.Content.Res;
 using Google.Android.Material.FloatingActionButton;
 using Android.Views.Animations;
+using System.Text;
 
 namespace SenMonitor
 {
@@ -249,6 +250,30 @@ namespace SenMonitor
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             return inflater.Inflate(Resource.Layout.fragment_my4, container, false);
+        }
+    }
+
+    public class MyTimePicker : Activity
+    {
+        private TimePicker timePicker;
+
+        protected override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+            SetContentView(Resource.Layout.fragment_my);
+
+            timePicker = FindViewById<TimePicker>(Resource.Id.timePicker1);
+            timePicker.SetIs24HourView(Java.Lang.Boolean.True); // Opcjonalnie, ustaw na False, jeśli chcesz używać formatu 12-godzinnego
+
+            timePicker.TimeChanged += TimePicker_TimeChanged;
+        }
+
+        private void TimePicker_TimeChanged(object sender, TimePicker.TimeChangedEventArgs e)
+        {
+            int hour = e.HourOfDay;
+            int minute = e.Minute;
+
+            // Tutaj możesz wykonać jakieś działania na podstawie wybranego czasu, na przykład zaktualizować interfejs użytkownika
         }
     }
 }

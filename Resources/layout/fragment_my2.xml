@@ -23,27 +23,27 @@
         android:layout_centerInParent="true"
         android:orientation="vertical"
         android:gravity="center">
-        
-    </LinearLayout>
-
-        <Button 
-            android:id="@+id/saveButton"
-            android:layout_width="70dp"
-            android:layout_height="30dp"
-            android:layout_below="@+id/heightTextView"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="180dp"
-            android:textSize="7dp"        
-            android:text="Powrót" />
-      <TextView
+         <TextView
             android:id="@+id/message2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
             android:textSize="15dp"
             android:textStyle="bold"   
             android:layout_centerHorizontal="true"
             android:textColor="#FFFFFF"
             android:text="Raporty" />
+
+         <Button 
+            android:id="@+id/saveButton"
+            android:layout_width="70dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/heightTextView"
+            android:layout_centerHorizontal="true"
+            android:textSize="7dp"        
+            android:text="Powrót" />
+     
+    </LinearLayout>
+
+       
     
 </RelativeLayout>
