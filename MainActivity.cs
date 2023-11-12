@@ -220,26 +220,48 @@ namespace SenMonitor
     }
 
 
-    
+
 
     public class Page2Fragment : AndroidX.Fragment.App.Fragment
     {
+        private TimePicker timePicker;
+        private int selectedHour;
+        private int selectedMinute;
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             View view = inflater.Inflate(Resource.Layout.fragment_my, container, false);
 
-            // Znajdź przycisk w fragmencie
-            Button czasSnu = view.FindViewById<Button>(Resource.Id.select_button);
+            // Znajdź TimePicker w widoku fragmentu
+            timePicker = view.FindViewById<TimePicker>(Resource.Id.timePicker1);
 
-            // Dodaj akcję do przycisku
-            czasSnu.Click += (sender, e) => {
-                // Kod do wykonania po kliknięciu przycisku
-                Toast.MakeText(Context, "Przycisk został kliknięty", ToastLength.Short).Show();
-            };
+            // Ustaw handler dla zdarzenia zmiany czasu
+            timePicker.TimeChanged += TimePicker_TimeChanged;
+
+            // Znajdź przycisk w widoku fragmentu
+            Button displayTimeButton = view.FindViewById<Button>(Resource.Id.select_button);
+
+            // Ustaw handler dla zdarzenia kliknięcia przycisku
+            displayTimeButton.Click += DisplayTimeButton_Click;
 
             return view;
         }
+
+        private void TimePicker_TimeChanged(object sender, TimePicker.TimeChangedEventArgs e)
+        {
+            // Zapisz wybrane wartości godziny i minuty
+            selectedHour = e.HourOfDay;
+            selectedMinute = e.Minute;
+        }
+
+        private void DisplayTimeButton_Click(object sender, EventArgs e)
+        {
+            // Wyświetl wybrane wartości godziny i minuty
+            string timeMessage = $"Wybrana godzina: {selectedHour}, Wybrana minuta: {selectedMinute}";
+            Toast.MakeText(Context, timeMessage, ToastLength.Short).Show();
+        }
     }
+
 
     public class Page3Fragment : AndroidX.Fragment.App.Fragment
     {
@@ -265,27 +287,4 @@ namespace SenMonitor
         }
     }
 
-    public class MyTimePicker : Activity
-    {
-        private TimePicker timePicker;
-
-        protected override void OnCreate(Bundle savedInstanceState)
-        {
-            base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.fragment_my);
-
-            timePicker = FindViewById<TimePicker>(Resource.Id.timePicker1);
-            timePicker.SetIs24HourView(Java.Lang.Boolean.True); // Opcjonalnie, ustaw na False, jeśli chcesz używać formatu 12-godzinnego
-
-            timePicker.TimeChanged += TimePicker_TimeChanged;
-        }
-
-        private void TimePicker_TimeChanged(object sender, TimePicker.TimeChangedEventArgs e)
-        {
-            int hour = e.HourOfDay;
-            int minute = e.Minute;
-
-            // Tutaj możesz wykonać jakieś działania na podstawie wybranego czasu, na przykład zaktualizować interfejs użytkownika
-        }
-    }
 }
