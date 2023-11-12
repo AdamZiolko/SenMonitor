@@ -72,7 +72,6 @@ namespace SenMonitor
 
             SetupFloatingActionButtonMenu();
 
-
         }
 
         private void SetupFloatingActionButtonMenu()
@@ -138,6 +137,8 @@ namespace SenMonitor
                         popupWindow.Dismiss();
                         fab.Animate().Alpha(1.0f).SetDuration(300);
                         isMenuOpen = false;
+
+
 
                     };
 
@@ -225,7 +226,18 @@ namespace SenMonitor
     {
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            return inflater.Inflate(Resource.Layout.fragment_my, container, false);
+            View view = inflater.Inflate(Resource.Layout.fragment_my, container, false);
+
+            // Znajdź przycisk w fragmencie
+            Button czasSnu = view.FindViewById<Button>(Resource.Id.select_button);
+
+            // Dodaj akcję do przycisku
+            czasSnu.Click += (sender, e) => {
+                // Kod do wykonania po kliknięciu przycisku
+                Toast.MakeText(Context, "Przycisk został kliknięty", ToastLength.Short).Show();
+            };
+
+            return view;
         }
     }
 
