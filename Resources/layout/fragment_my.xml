@@ -37,10 +37,16 @@
             android:text="Dodaj Sen: " />
 
         <TimePicker
-    android:id="@+id/timePicker1"
-    android:layout_width="150dp"
-    android:layout_height="50dp" 
-       />
+            android:id="@+id/timePicker1"
+            android:layout_width="150dp"
+            android:layout_height="50dp" 
+        />
+
+        <TimePicker
+            android:id="@+id/timePicker2"
+            android:layout_width="150dp"
+            android:layout_height="50dp" 
+        />
     <Button
             android:id="@+id/select_button"
             android:paddingLeft="4dp"
@@ -51,15 +57,7 @@
             android:layout_centerHorizontal="true"
             android:text="Dodaj"
             android:textSize="8dp" />
-    <TextView
-            android:id="@+id/time_display"
-            android:textStyle="bold"
-            android:layout_height="30dp"
-            android:layout_width="130dp"
-            android:textColor="#FFFFFF"
-            android:layout_centerHorizontal="true"
-            android:text="Wybrany czas pojawi się tutaj"
-            android:textSize="10dp" />
+
 
 
     

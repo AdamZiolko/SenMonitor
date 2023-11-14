@@ -14,6 +14,7 @@ using Android.Content.Res;
 using Google.Android.Material.FloatingActionButton;
 using Android.Views.Animations;
 using System.Text;
+using Android.Hardware.Usb;
 
 namespace SenMonitor
 {
@@ -133,7 +134,7 @@ namespace SenMonitor
                     // Obsługa innych opcji podobnie jak powyżej
                     popupView.FindViewById(Resource.Id.navigation_page2).Click += (s, args) =>
                     {
-                        ShowFragment(new Page2Fragment());
+                        ShowFragment(new Page2Fragment(_databaseManager));
                         popupWindow.Dismiss();
                         fab.Animate().Alpha(1.0f).SetDuration(300);
                         isMenuOpen = false;
@@ -225,8 +226,15 @@ namespace SenMonitor
     public class Page2Fragment : AndroidX.Fragment.App.Fragment
     {
         private TimePicker timePicker;
-        private int selectedHour;
-        private int selectedMinute;
+        private TimePicker timePicker2;
+        private int selectedHour = 6;
+        private int selectedMinute = 16;
+        private DatabaseManager _databaseManager;
+
+        public Page2Fragment(DatabaseManager databaseManager)
+        {
+            _databaseManager = databaseManager;
+        }
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -234,6 +242,7 @@ namespace SenMonitor
 
             // Znajdź TimePicker w widoku fragmentu
             timePicker = view.FindViewById<TimePicker>(Resource.Id.timePicker1);
+            timePicker2 = view.FindViewById<TimePicker>(Resource.Id.timePicker2);
 
             // Ustaw handler dla zdarzenia zmiany czasu
             timePicker.TimeChanged += TimePicker_TimeChanged;
@@ -256,11 +265,45 @@ namespace SenMonitor
 
         private void DisplayTimeButton_Click(object sender, EventArgs e)
         {
+            // Pobierz wartości z drugiego TimePicker
+            int selectedHour2 = timePicker2.Hour;
+            int selectedMinute2 = timePicker2.Minute;
+            int czasWMinutach = 0;
+            // Dodaj godziny i minuty z obu TimePickers
+            if (selectedHour > selectedHour2)
+            {
+                selectedHour = 24  - selectedHour;
+                selectedMinute = 60 - selectedMinute;
+                czasWMinutach = selectedHour * 60 + selectedHour2*60 + selectedMinute2;
+            } else {
+                czasWMinutach = selectedHour2*60 + selectedMinute2 - (selectedHour * 60 + selectedMinute);
+            };
+
+            int godziny = (int)Math.Floor((double)czasWMinutach / 60);
+            int okraglyCzas = (int)Math.Round((double)czasWMinutach / 60);
+            int minuty = czasWMinutach % 60;
+            Console.WriteLine(selectedHour);
+            Console.WriteLine(selectedHour2);
+
+            DateTime currentDate = DateTime.Now;
+
+            // Konwertuj datę na łańcuch tekstowy w formacie "yyyy-MM-dd"
+            string formattedDate = currentDate.ToString("yyyy-MM-dd");
+            int ocenaSnu = 5;
+            _databaseManager.InsertDaneSnow(formattedDate, okraglyCzas, ocenaSnu);
+
+            // Możesz wyświetlić lub użyć formattedDate w swojej aplikacji
+            Console.WriteLine(_databaseManager.GetLatestDane("BazaSnow","Data"));
+            Console.WriteLine(_databaseManager.GetLatestDane("BazaSnow", "CzasTrwania"));
+            Console.WriteLine(_databaseManager.GetLatestDane("BazaSnow", "Ocena"));
+
+
             // Wyświetl wybrane wartości godziny i minuty
-            string timeMessage = $"Wybrana godzina: {selectedHour}, Wybrana minuta: {selectedMinute}";
+            string timeMessage = $"Suma godzin: {godziny}, Suma minut: {minuty}";
             Toast.MakeText(Context, timeMessage, ToastLength.Short).Show();
         }
     }
+
 
 
     public class Page3Fragment : AndroidX.Fragment.App.Fragment

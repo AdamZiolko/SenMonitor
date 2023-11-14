@@ -4098,7 +4098,7 @@ namespace SenMonitor
 			public const int timePicker1 = 2131230949;
 			
 			// aapt resource value: 0x7F0800E6
-			public const int time_display = 2131230950;
+			public const int timePicker2 = 2131230950;
 			
 			// aapt resource value: 0x7F0800E7
 			public const int title = 2131230951;
