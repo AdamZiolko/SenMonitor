@@ -24,7 +24,7 @@
         android:orientation="vertical"
         android:gravity="center">
         <TextView
-            android:id="@+id/message2"
+            android:id="@+id/TekstUstawienia"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15dp"
@@ -33,7 +33,7 @@
             android:textColor="#FFFFFF"
             android:text="Ustawienia" />
         <Button 
-            android:id="@+id/saveButton"
+            android:id="@+id/Ustawione"
             android:layout_width="70dp"
             android:layout_height="30dp"
             android:layout_below="@+id/heightTextView"

@@ -125,5 +125,32 @@ namespace SenMonitor
                 db.EndTransaction();
             }
         }
+
+        public List<BazaSnowData> GetLast60DaneSnow()
+        {
+            List<BazaSnowData> data = new List<BazaSnowData>();
+            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
+            {
+                db.BeginTransaction();
+                string query = "SELECT Data, CzasTrwania, Ocena FROM BazaSnow ORDER BY Id DESC LIMIT 60";
+                using (var cursor = db.RawQuery(query, null))
+                {
+                    while (cursor.MoveToNext())
+                    {
+                        BazaSnowData dane = new BazaSnowData
+                        {
+                            Data = cursor.GetString(cursor.GetColumnIndex("Data")),
+                            CzasTrwania = cursor.GetInt(cursor.GetColumnIndex("CzasTrwania")),
+                            Ocena = cursor.GetInt(cursor.GetColumnIndex("Ocena"))
+                        };
+
+                        data.Add(dane);
+                    }
+                }
+                db.SetTransactionSuccessful();
+                db.EndTransaction();
+            }
+            return data;
+        }
     }
 }

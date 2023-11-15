@@ -10,6 +10,19 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+	<style name="AppTheme2" parent="Theme.MaterialComponents.Light.NoActionBar">
+		<!-- Customize your theme here. -->
+		<item name="android:windowNoTitle">true</item>
+
+		<item name="colorPrimary">#FF5733</item>
+		<!-- Przykładowy kolor -->
+		<item name="colorPrimaryDark">#FF4500</item>
+		<!-- Przykładowy kolor -->
+		<item name="colorAccent">#FFD700</item>
+		<!-- Przykładowy kolor -->
+	</style>
+
+
 	<style name="PopupMenuStyle" parent="Widget.AppCompat.PopupMenu">
 		<!-- Ustal tło PopupMenu na jasny żółty kolor (#FFFF00) -->
 		<item name="android:popupBackground">#FFFF00</item>

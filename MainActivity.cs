@@ -15,12 +15,16 @@ using Google.Android.Material.FloatingActionButton;
 using Android.Views.Animations;
 using System.Text;
 using Android.Hardware.Usb;
+using AndroidX.Core.Content;
+using System.Collections.Generic;
 
 namespace SenMonitor
 {
     [Activity(Label = "SenMonitor", MainLauncher = true)]
     public class MainActivity : AppCompatActivity//, BottomNavigationView.IOnNavigationItemSelectedListener
     {
+        //public static int ImageResource { get; set; } = Resource.Drawable.domyslny_obraz;
+
         private SensorManager _sensorManager;
         private DatabaseManager _databaseManager;
 
@@ -316,9 +320,40 @@ namespace SenMonitor
 
     public class Page4Fragment : AndroidX.Fragment.App.Fragment
     {
+        private ListView listView;
+        private ArrayAdapter<string> adapter; // Zmiana typu adaptera na ArrayAdapter<string>
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            return inflater.Inflate(Resource.Layout.fragment_my3, container, false);
+            View view = inflater.Inflate(Resource.Layout.fragment_my3, container, false);
+
+            // Inicjalizacja ListView i ArrayAdapter<string>
+            listView = view.FindViewById<ListView>(Resource.Id.wypisDanych);
+            adapter = new ArrayAdapter<string>(Activity, Android.Resource.Layout.SimpleListItem1);
+            listView.Adapter = adapter;
+
+            // Wywołaj funkcję do pobrania danych i ustawienia adaptera
+            UpdateListView();
+
+            return view;
+        }
+
+        private void UpdateListView()
+        {
+            // Tutaj dostarcz swój DatabaseManager (przykładowo za pomocą konstruktora lub wstrzykiwania zależności)
+            DatabaseManager databaseManager = new DatabaseManager(Activity);
+
+            List<BazaSnowData> daneList = databaseManager.GetLast60DaneSnow();
+
+            // Przetwórz dane na odpowiedni format stringa i dodaj do adaptera
+            foreach (var dane in daneList)
+            {
+                string formattedData = $"{dane.Data} - {dane.CzasTrwania} - {dane.Ocena}";
+                adapter.Add(formattedData);
+            }
+
+            // Powiadom adapter o zmianach
+            adapter.NotifyDataSetChanged();
         }
     }
 
@@ -326,8 +361,31 @@ namespace SenMonitor
     {
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            return inflater.Inflate(Resource.Layout.fragment_my4, container, false);
+            View view = inflater.Inflate(Resource.Layout.fragment_my4, container, false);
+
+            // Znajdź przycisk w fragmencie
+            Button ustawienia = view.FindViewById<Button>(Resource.Id.Ustawione);
+
+            // Dodaj akcję do przycisku
+            ustawienia.Click += (sender, e) => {
+              
+              
+                Toast.MakeText(Context, "Przycisk został kliknięty", ToastLength.Short).Show();
+            };
+
+            return view;
         }
     }
+
+    public class BazaSnowData
+    {
+        public string Data { get; set; }
+        public int CzasTrwania { get; set; }
+        public int Ocena { get; set; }
+    }
+
+
+
+
 
 }
