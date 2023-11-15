@@ -22,7 +22,7 @@ using SenMonitor.Sensors;
 namespace SenMonitor
 {
     [Activity(Label = "SenMonitor", MainLauncher = true)]
-    public class MainActivity : AppCompatActivity//, BottomNavigationView.IOnNavigationItemSelectedListener
+    public partial class MainActivity : AppCompatActivity//, BottomNavigationView.IOnNavigationItemSelectedListener
     {
         //public static int ImageResource { get; set; } = Resource.Drawable.domyslny_obraz;
 
@@ -69,6 +69,7 @@ namespace SenMonitor
             //_daneZBazy.Text = latestData;
             _databaseManager.ClearAllData();
 
+
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             //////////////// Menu Zakładkowe /////////////////////////////////////////////////////
@@ -82,6 +83,40 @@ namespace SenMonitor
             SetupFloatingActionButtonMenu();
 
         }
+
+        
+
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+            //BottomNavigationView navigation = FindViewById<BottomNavigationView>(Resource.Id.navigation);
+            //navigation.SetOnNavigationItemSelectedListener(this);
+            // to jest dodane jak wyjdzie i wejdzie
+
+            _accelerometerHandler.StartListening();
+           // _audioRecorder.StartRecording();
+            _heartRateSensorHandler.StartListening(); // Rozpocznij nasłuchiwanie czujnika tętna
+        }
+
+        protected override void OnPause()
+        {
+            base.OnPause();
+
+            _accelerometerHandler.StopListening();
+           // _audioRecorder.StopRecording();
+            _heartRateSensorHandler.StopListening(); // Zatrzymaj nasłuchiwanie czujnika tętna
+            _gyroscopeSensorHandler.StopListening();
+
+        }
+
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+        {
+            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
 
         private void SetupFloatingActionButtonMenu()
         {
@@ -196,199 +231,10 @@ namespace SenMonitor
                 }
             }
         }
-
-
-        protected override void OnResume()
-        {
-            base.OnResume();
-            //BottomNavigationView navigation = FindViewById<BottomNavigationView>(Resource.Id.navigation);
-            //navigation.SetOnNavigationItemSelectedListener(this);
-            // to jest dodane jak wyjdzie i wejdzie
-
-            _accelerometerHandler.StartListening();
-           // _audioRecorder.StartRecording();
-            _heartRateSensorHandler.StartListening(); // Rozpocznij nasłuchiwanie czujnika tętna
-        }
-
-        protected override void OnPause()
-        {
-            base.OnPause();
-
-            _accelerometerHandler.StopListening();
-           // _audioRecorder.StopRecording();
-            _heartRateSensorHandler.StopListening(); // Zatrzymaj nasłuchiwanie czujnika tętna
-            _gyroscopeSensorHandler.StopListening();
-
-        }
-
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
-        {
-            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-
-            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-        
     }
 
 
-
-
-    public class Page2Fragment : AndroidX.Fragment.App.Fragment
-    {
-        private TimePicker timePicker;
-        private TimePicker timePicker2;
-        private int selectedHour = 6;
-        private int selectedMinute = 16;
-        private DatabaseManager _databaseManager;
-
-        public Page2Fragment(DatabaseManager databaseManager)
-        {
-            _databaseManager = databaseManager;
-        }
-
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-        {
-            View view = inflater.Inflate(Resource.Layout.fragment_my, container, false);
-
-            // Znajdź TimePicker w widoku fragmentu
-            timePicker = view.FindViewById<TimePicker>(Resource.Id.timePicker1);
-            timePicker2 = view.FindViewById<TimePicker>(Resource.Id.timePicker2);
-
-            // Ustaw handler dla zdarzenia zmiany czasu
-            timePicker.TimeChanged += TimePicker_TimeChanged;
-
-            // Znajdź przycisk w widoku fragmentu
-            Button displayTimeButton = view.FindViewById<Button>(Resource.Id.select_button);
-
-            // Ustaw handler dla zdarzenia kliknięcia przycisku
-            displayTimeButton.Click += DisplayTimeButton_Click;
-
-            return view;
-        }
-
-        private void TimePicker_TimeChanged(object sender, TimePicker.TimeChangedEventArgs e)
-        {
-            // Zapisz wybrane wartości godziny i minuty
-            selectedHour = e.HourOfDay;
-            selectedMinute = e.Minute;
-        }
-
-        private void DisplayTimeButton_Click(object sender, EventArgs e)
-        {
-            // Pobierz wartości z drugiego TimePicker
-            int selectedHour2 = timePicker2.Hour;
-            int selectedMinute2 = timePicker2.Minute;
-            int czasWMinutach = 0;
-            // Dodaj godziny i minuty z obu TimePickers
-            if (selectedHour > selectedHour2)
-            {
-                selectedHour = 24  - selectedHour;
-                selectedMinute = 60 - selectedMinute;
-                czasWMinutach = selectedHour * 60 + selectedHour2*60 + selectedMinute2;
-            } else {
-                czasWMinutach = selectedHour2*60 + selectedMinute2 - (selectedHour * 60 + selectedMinute);
-            };
-
-            int godziny = (int)Math.Floor((double)czasWMinutach / 60);
-            int okraglyCzas = (int)Math.Round((double)czasWMinutach / 60);
-            int minuty = czasWMinutach % 60;
-            Console.WriteLine(selectedHour);
-            Console.WriteLine(selectedHour2);
-
-            DateTime currentDate = DateTime.Now;
-
-            // Konwertuj datę na łańcuch tekstowy w formacie "yyyy-MM-dd"
-            string formattedDate = currentDate.ToString("yyyy-MM-dd");
-            int ocenaSnu = 5;
-            _databaseManager.InsertDaneSnow(formattedDate, okraglyCzas, ocenaSnu);
-
-            // Możesz wyświetlić lub użyć formattedDate w swojej aplikacji
-            Console.WriteLine(_databaseManager.GetLatestDane("BazaSnow","Data"));
-            Console.WriteLine(_databaseManager.GetLatestDane("BazaSnow", "CzasTrwania"));
-            Console.WriteLine(_databaseManager.GetLatestDane("BazaSnow", "Ocena"));
-
-
-            // Wyświetl wybrane wartości godziny i minuty
-            string timeMessage = $"Suma godzin: {godziny}, Suma minut: {minuty}";
-            Toast.MakeText(Context, timeMessage, ToastLength.Short).Show();
-        }
-    }
-
-
-
-    public class Page3Fragment : AndroidX.Fragment.App.Fragment
-    {
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-        {
-            return inflater.Inflate(Resource.Layout.fragment_my2, container, false);
-        }
-    }
-
-    public class Page4Fragment : AndroidX.Fragment.App.Fragment
-    {
-        private ListView listView;
-        private ArrayAdapter<string> adapter; // Zmiana typu adaptera na ArrayAdapter<string>
-
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-        {
-            View view = inflater.Inflate(Resource.Layout.fragment_my3, container, false);
-
-            // Inicjalizacja ListView i ArrayAdapter<string>
-            listView = view.FindViewById<ListView>(Resource.Id.wypisDanych);
-            adapter = new ArrayAdapter<string>(Activity, Android.Resource.Layout.SimpleListItem1);
-            listView.Adapter = adapter;
-
-            // Wywołaj funkcję do pobrania danych i ustawienia adaptera
-            UpdateListView();
-
-            return view;
-        }
-
-        private void UpdateListView()
-        {
-            // Tutaj dostarcz swój DatabaseManager (przykładowo za pomocą konstruktora lub wstrzykiwania zależności)
-            DatabaseManager databaseManager = new DatabaseManager(Activity);
-
-            List<BazaSnowData> daneList = databaseManager.GetLast60DaneSnow();
-
-            // Przetwórz dane na odpowiedni format stringa i dodaj do adaptera
-            foreach (var dane in daneList)
-            {
-                string formattedData = $"{dane.Data} - {dane.CzasTrwania} - {dane.Ocena}";
-                adapter.Add(formattedData);
-            }
-
-            // Powiadom adapter o zmianach
-            adapter.NotifyDataSetChanged();
-        }
-    }
-
-    public class Page5Fragment : AndroidX.Fragment.App.Fragment
-    {
-        public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-        {
-            View view = inflater.Inflate(Resource.Layout.fragment_my4, container, false);
-
-            // Znajdź przycisk w fragmencie
-            Button ustawienia = view.FindViewById<Button>(Resource.Id.Ustawione);
-
-            // Dodaj akcję do przycisku
-            ustawienia.Click += (sender, e) => {
-              
-              
-                Toast.MakeText(Context, "Przycisk został kliknięty", ToastLength.Short).Show();
-            };
-
-            return view;
-        }
-    }
-
-    public class BazaSnowData
-    {
-        public string Data { get; set; }
-        public int CzasTrwania { get; set; }
-        public int Ocena { get; set; }
-    }
+  
 
 
 
