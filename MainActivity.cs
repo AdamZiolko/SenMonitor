@@ -17,6 +17,7 @@ using System.Text;
 using Android.Hardware.Usb;
 using AndroidX.Core.Content;
 using System.Collections.Generic;
+using SenMonitor.Sensors;
 
 namespace SenMonitor
 {
@@ -35,6 +36,7 @@ namespace SenMonitor
         private AccelerometerHandler _accelerometerHandler;
         //private AudioRecorder _audioRecorder;
         private HeartRateSensorHandler _heartRateSensorHandler; // Dodanie obsługi czujnika tętna
+        private GyroscopeSensorHandler _gyroscopeSensorHandler;
 
 
 
@@ -55,7 +57,9 @@ namespace SenMonitor
             _accelerometerHandler = new AccelerometerHandler(_sensorManager, _accelerometerDataTextView, _databaseManager);
             // _audioRecorder = new AudioRecorder(_volumeLevelTextView);
             _heartRateSensorHandler = new HeartRateSensorHandler(_sensorManager, _heartRateTextView); // Inicjalizacja obsługi czujnika tętna
-
+            _heartRateSensorHandler.StartListening();
+            _gyroscopeSensorHandler = new GyroscopeSensorHandler(_sensorManager, _databaseManager);
+            _gyroscopeSensorHandler.StartListening();
             //////////////// Baza danych ///////////////////////////////////////////////////////////////////////////////////////////////
             //string dataToSave = "Twoje dane do zapisania";
             //_databaseManager.InsertSensorData(dataToSave);
@@ -213,6 +217,8 @@ namespace SenMonitor
             _accelerometerHandler.StopListening();
            // _audioRecorder.StopRecording();
             _heartRateSensorHandler.StopListening(); // Zatrzymaj nasłuchiwanie czujnika tętna
+            _gyroscopeSensorHandler.StopListening();
+
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
