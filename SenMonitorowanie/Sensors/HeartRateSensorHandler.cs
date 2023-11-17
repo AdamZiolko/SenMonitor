@@ -1,67 +1,60 @@
 ﻿using Android.Hardware;
-using Android.Widget;
+using System;
 
 namespace SenMonitorowanie
 {
     public class HeartRateSensorHandler
     {
         private SensorManager _sensorManager;
-        private TextView _heartRateTextView;
-        private Sensor _heartRateSensor;
         private ISensorEventListener _heartRateSensorListener;
 
-        public HeartRateSensorHandler(SensorManager sensorManager, TextView heartRateTextView)
+        public HeartRateSensorHandler(SensorManager sensorManager)
         {
             _sensorManager = sensorManager;
-            _heartRateTextView = heartRateTextView;
 
             // Pobierz czujnik tętna
-            _heartRateSensor = _sensorManager.GetDefaultSensor(SensorType.HeartRate);
-
-            if (_heartRateSensor == null)
+            Sensor heartRateSensor = _sensorManager.GetDefaultSensor(SensorType.HeartRate);
+            Console.WriteLine("HeartRateSensorHandler");
+            if (heartRateSensor == null)
             {
                 // Obsługa braku dostępnego czujnika tętna
-                _heartRateTextView.Text = "Brak dostępnego czujnika tętna";
+                Console.WriteLine("Brak dostępnego czujnika tętna");
+                return;
             }
 
             // Utwórz słuchacza czujnika tętna
-            _heartRateSensorListener = new HeartRateSensorListener(this);
+            _heartRateSensorListener = new HeartRateSensorListener();
         }
 
         public void StartListening()
         {
-            if (_heartRateSensor != null)
+            Console.WriteLine("StartListeningPoczatek");
+
+            if (_heartRateSensorListener != null)
             {
+                Console.WriteLine("StartListeningKoniec");
+
                 // Rozpocznij nasłuchiwanie czujnika tętna
-                _sensorManager.RegisterListener(_heartRateSensorListener, _heartRateSensor, SensorDelay.Normal);
+                _sensorManager.RegisterListener(_heartRateSensorListener, _sensorManager.GetDefaultSensor(SensorType.HeartRate), SensorDelay.Normal);
             }
         }
 
         public void StopListening()
         {
-            if (_heartRateSensor != null)
+            Console.WriteLine("StopListeningPoczatek");
+
+            if (_heartRateSensorListener != null)
             {
+                Console.WriteLine("StopListeningKoniec");
+
                 // Zatrzymaj nasłuchiwanie czujnika tętna
                 _sensorManager.UnregisterListener(_heartRateSensorListener);
             }
         }
 
-        public void UpdateHeartRate(float heartRate)
-        {
-            // Aktualizuj wartość TextView w interfejsie użytkownika
-            _heartRateTextView.Text = "Heart Rate: " + heartRate.ToString();
-        }
-
         // Klasa do obsługi odczytów z czujnika tętna
         private class HeartRateSensorListener : Java.Lang.Object, ISensorEventListener
         {
-            private HeartRateSensorHandler _handler;
-
-            public HeartRateSensorListener(HeartRateSensorHandler handler)
-            {
-                _handler = handler;
-            }
-
             public void OnAccuracyChanged(Sensor sensor, SensorStatus accuracy)
             {
                 // Niepotrzebne dla tętna
@@ -69,11 +62,18 @@ namespace SenMonitorowanie
 
             public void OnSensorChanged(SensorEvent e)
             {
+                Console.WriteLine("czujnikSercaDziała");
                 if (e.Sensor.Type == SensorType.HeartRate)
                 {
                     float heartRate = e.Values[0];
-                    _handler.UpdateHeartRate(heartRate);
+                    UpdateHeartRate(heartRate);
                 }
+            }
+
+            private void UpdateHeartRate(float heartRate)
+            {
+                // Aktualizuj wartość na konsoli
+                Console.WriteLine("Heart Rate: " + heartRate.ToString());
             }
         }
     }

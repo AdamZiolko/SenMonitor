@@ -32,6 +32,8 @@ namespace SenMonitorowanie
         private GyroscopeSensorHandler _gyroscopeSensorHandler;
 
 
+        public bool IsMonitoring = false;
+        private Button mainMonitoringButton;
 
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -49,10 +51,8 @@ namespace SenMonitorowanie
 
           _accelerometerHandler = new AccelerometerHandler(_sensorManager, _databaseManager);
            //_audioRecorder = new AudioRecorder(_volumeLevelTextView);
-          _heartRateSensorHandler = new HeartRateSensorHandler(_sensorManager, _heartRateTextView); // Inicjalizacja obsługi czujnika tętna
-          _heartRateSensorHandler.StartListening();
+          _heartRateSensorHandler = new HeartRateSensorHandler(_sensorManager); // Inicjalizacja obsługi czujnika tętna
          _gyroscopeSensorHandler = new GyroscopeSensorHandler(_sensorManager, _databaseManager);
-          _gyroscopeSensorHandler.StartListening();
             //////////////// Baza danych ///////////////////////////////////////////////////////////////////////////////////////////////
             //string dataToSave = "Twoje dane do zapisania";
             //_databaseManager.InsertSensorData(dataToSave);
@@ -63,21 +63,66 @@ namespace SenMonitorowanie
             _databaseManager.ClearAllData();
             SetAmbientEnabled();
 
+            FragmentManager fragmentManager = FragmentManager;
 
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Rozpoczęcie transakcji fragmentu
+            FragmentTransaction fragmentTransaction = fragmentManager.BeginTransaction();
 
-            //////////////// Menu Zakładkowe /////////////////////////////////////////////////////
+            // Zastąpienie istniejącego fragmentu nowym fragmentem
+            fragmentTransaction.Replace(Resource.Id.fragment_container, new monitoringScreen());
+
+            // Dodanie transakcji do back stack (aby można było wrócić do poprzedniego fragmentu przyciskiem "Back")
+            fragmentTransaction.AddToBackStack(null);
+
+            // Zatwierdzenie transakcji
+            fragmentTransaction.Commit();
 
 
-   
 
 
 
             SetupFloatingActionButtonMenu();
 
- 
+
+            mainMonitoringButton = FindViewById<Button>(Resource.Id.startMonitoring);
+
+            // Initialize sensor handler objects
+/*
+            mainMonitoringButton.Click += (sender, e) =>
+            {
+                Console.WriteLine("Button pressed");
+                if (!isMonitoring)
+                {
+                    StartSleepMonitoring();
+                }
+                else
+                {
+                    StopSleepMonitoring();
+                }
+            };*/
         }
 
+        public void StartSleepMonitoring()
+        {
+            IsMonitoring = true;
+
+            // Start listening to sensors
+            _accelerometerHandler.StartListening();
+            //_audioRecorder.StartRecording();
+            _heartRateSensorHandler.StartListening();
+            _gyroscopeSensorHandler.StartListening();
+        }
+
+        public void StopSleepMonitoring()
+        {
+            IsMonitoring = false;
+
+            // Stop listening to sensors
+            _accelerometerHandler.StopListening();
+            //_audioRecorder.StopRecording();
+            _heartRateSensorHandler.StopListening();
+            _gyroscopeSensorHandler.StopListening();
+        }
 
 
 
@@ -86,19 +131,19 @@ namespace SenMonitorowanie
             base.OnResume();
 
 
-            _accelerometerHandler.StartListening();
+            //_accelerometerHandler.StartListening();
             // _audioRecorder.StartRecording();
-            _heartRateSensorHandler.StartListening(); // Rozpocznij nasłuchiwanie czujnika tętna
+           // _heartRateSensorHandler.StartListening(); // Rozpocznij nasłuchiwanie czujnika tętna
         }
 
         protected override void OnPause()
         {
             base.OnPause();
 
-           _accelerometerHandler.StopListening();
+           //_accelerometerHandler.StopListening();
             // _audioRecorder.StopRecording();
-            _heartRateSensorHandler.StopListening(); // Zatrzymaj nasłuchiwanie czujnika tętna
-            _gyroscopeSensorHandler.StopListening();
+           // _heartRateSensorHandler.StopListening(); // Zatrzymaj nasłuchiwanie czujnika tętna
+            //_gyroscopeSensorHandler.StopListening();
 
         }
 
