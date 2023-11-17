@@ -115,6 +115,7 @@ namespace SenMonitorowanie
         private void SetupFloatingActionButtonMenu()
         {
             var fab = FindViewById<AppCompatImageButton>(Resource.Id.fab);
+
             bool isMenuOpen = false; // Zmienna śledząca stan menu
 
 
@@ -133,7 +134,7 @@ namespace SenMonitorowanie
                     fab.GetLocationOnScreen(location);
                     int x = location[0] - popupWindow.Width; // Wyśrodkuj w poziomie
                     int y = location[1] - popupWindow.Height; // Przesuń menu w górę
-                    Console.WriteLine(location[0]);
+                    
                     popupWindow.ShowAtLocation(fab, GravityFlags.CenterHorizontal, 0, -60);
 
                     // Przygotowanie popupView do animacji początkowej

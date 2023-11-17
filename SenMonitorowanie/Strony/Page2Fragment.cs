@@ -67,20 +67,22 @@ namespace SenMonitorowanie
             int godziny = (int)Math.Floor((double)czasWMinutach / 60);
             int okraglyCzas = (int)Math.Round((double)czasWMinutach / 60);
             int minuty = czasWMinutach % 60;
-            Console.WriteLine(selectedHour);
-            Console.WriteLine(selectedHour2);
+
 
             DateTime currentDate = DateTime.Now;
 
             // Konwertuj datę na łańcuch tekstowy w formacie "yyyy-MM-dd"
             string formattedDate = currentDate.ToString("yyyy-MM-dd");
-            int ocenaSnu = 5;
-            _databaseManager.InsertDaneSnow(formattedDate, okraglyCzas, ocenaSnu);
+            int ocenaSnu = 0;
 
-            // Możesz wyświetlić lub użyć formattedDate w swojej aplikacji
-            Console.WriteLine(_databaseManager.GetLatestDane("BazaSnow", "Data"));
-            Console.WriteLine(_databaseManager.GetLatestDane("BazaSnow", "CzasTrwania"));
-            Console.WriteLine(_databaseManager.GetLatestDane("BazaSnow", "Ocena"));
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            if (selectedHour <= 22 && selectedHour >= 19) ocenaSnu += 1;                                    // odpowiednia pora snu
+            if (okraglyCzas >= 9 && okraglyCzas >= 7) ocenaSnu += 1;                                        // odpowiedni czas snu
+            if (_databaseManager.GetLatestDane("BazaSnow", "Data") != formattedDate) ocenaSnu += 1;         // nie za duża ilosc snow na dzien 
+            if (Int32.Parse(_databaseManager.GetLatestDane("BazaSnow", "Ocena")) >= ocenaSnu) ocenaSnu += 1;// punkty za utrzymanie oceny snu z dnia poprzedniego
+            ////////////////////////////////////////////////////////////////////////////////////////////////
+
+            _databaseManager.InsertDaneSnow(formattedDate, okraglyCzas, ocenaSnu);
 
             // Wyświetl wybrane wartości godziny i minuty
             string timeMessage = $"Suma godzin: {godziny}, Suma minut: {minuty}";

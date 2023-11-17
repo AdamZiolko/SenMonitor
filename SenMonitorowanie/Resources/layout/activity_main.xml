@@ -83,7 +83,7 @@
         android:layout_height="35dp"
         android:layout_centerHorizontal="true"
         android:src="@drawable/przyciskAkcji"
-        android:layout_marginTop="170dp"
+        android:layout_marginTop="190dp"
          />
     
 </RelativeLayout>
