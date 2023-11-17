@@ -34,7 +34,7 @@ public class AccelerometerHandler : Java.Lang.Object, ISensorEventListener
 
     public void OnAccuracyChanged(Sensor sensor, [GeneratedEnum] SensorStatus accuracy)
     {
-        // Do something when accuracy of the sensor changes
+        // Zrób coś, gdy zmieni się dokładność czujnika
     }
 
     public void OnSensorChanged(SensorEvent e)
