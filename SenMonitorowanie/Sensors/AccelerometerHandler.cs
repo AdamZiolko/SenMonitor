@@ -14,10 +14,10 @@ public class AccelerometerHandler : Java.Lang.Object, ISensorEventListener
     private TextView _accelerometerDataTextView;
     private int counter = 0;
     private DatabaseManager _databaseManager;
-    public AccelerometerHandler(SensorManager sensorManager, TextView accelerometerDataTextView, DatabaseManager databaseManager)
+    public AccelerometerHandler(SensorManager sensorManager, DatabaseManager databaseManager)
     {
         _sensorManager = sensorManager;
-        _accelerometerDataTextView = accelerometerDataTextView;
+       // _accelerometerDataTextView = accelerometerDataTextView;
         _databaseManager = databaseManager;
     }
 
@@ -48,7 +48,7 @@ public class AccelerometerHandler : Java.Lang.Object, ISensorEventListener
                 _databaseManager.InsertSensorData(x.ToString());
                 List<string> last60Data = _databaseManager.GetLast60SensorData();
 
-                _accelerometerDataTextView.Text = string.Join("\n", last60Data); // Wyświetl dane w jednym TextView, każdy w nowej linii
+               // _accelerometerDataTextView.Text = string.Join("\n", last60Data); // Wyświetl dane w jednym TextView, każdy w nowej linii
                 counter = 0;
             }
         }

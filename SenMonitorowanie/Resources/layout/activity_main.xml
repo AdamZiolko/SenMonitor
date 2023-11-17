@@ -13,16 +13,7 @@
         android:layout_centerInParent="true"
         android:layout_margin="0dp"
     />
-    <TextView
-        android:id="@id/message2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="35dp"
-        android:layout_centerHorizontal="true"
-        android:textSize="15dp"
-        android:textStyle="bold"  
-        android:textColor="#FFFFFF"
-        android:text="Wynik Twojego\nSnu:" />
+
 
 
      
@@ -37,36 +28,15 @@
 
          
 
-        <TextView
-            android:id="@+id/accelerometerDataTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Accelerometer Data"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-
-        />
-        <TextView
-            android:id="@+id/txtHeartRate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Heart Rate: 0"
-            android:textSize="15sp"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-        />
-       
-
-        <TextView
-            android:id="@+id/volumeLevelTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Volume Level"
-            android:textSize="15sp"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-        />
+           <Button
+        android:id="@+id/startMonitoring"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Mierzenia Snu"
+        android:layout_gravity="center"
+        android:padding="5dp" 
+        android:background="@drawable/round_menu"
+        android:textSize="10dp"/>
 
     </LinearLayout>
 

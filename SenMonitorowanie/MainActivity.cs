@@ -19,7 +19,6 @@ namespace SenMonitorowanie
     [Activity(Label = "SenMonitor", MainLauncher = true)]
     public class MainActivity : WearableActivity//, BottomNavigationView.IOnNavigationItemSelectedListener
     {
-        //public static int ImageResource { get; set; } = Resource.Drawable.domyslny_obraz;
 
         private SensorManager _sensorManager;
         private DatabaseManager _databaseManager;
@@ -27,7 +26,6 @@ namespace SenMonitorowanie
         private TextView _accelerometerDataTextView;
         // private TextView _volumeLevelTextView;
         private TextView _heartRateTextView; // Deklaracja TextView dla tętna
-        private TextView _daneZBazy;
         private AccelerometerHandler _accelerometerHandler;
         //private AudioRecorder _audioRecorder;
         private HeartRateSensorHandler _heartRateSensorHandler; // Dodanie obsługi czujnika tętna
@@ -45,11 +43,11 @@ namespace SenMonitorowanie
             _sensorManager = (SensorManager)GetSystemService(SensorService);
             _databaseManager = new DatabaseManager(this);
 
-            _accelerometerDataTextView = FindViewById<TextView>(Resource.Id.accelerometerDataTextView);
+            //_accelerometerDataTextView = FindViewById<TextView>(Resource.Id.accelerometerDataTextView);
             // _volumeLevelTextView = FindViewById<TextView>(Resource.Id.volumeLevelTextView);
-            _heartRateTextView = FindViewById<TextView>(Resource.Id.txtHeartRate); // Inicjalizacja TextView dla tętna
+            //_heartRateTextView = FindViewById<TextView>(Resource.Id.txtHeartRate); // Inicjalizacja TextView dla tętna
 
-          _accelerometerHandler = new AccelerometerHandler(_sensorManager, _accelerometerDataTextView, _databaseManager);
+          _accelerometerHandler = new AccelerometerHandler(_sensorManager, _databaseManager);
            //_audioRecorder = new AudioRecorder(_volumeLevelTextView);
           _heartRateSensorHandler = new HeartRateSensorHandler(_sensorManager, _heartRateTextView); // Inicjalizacja obsługi czujnika tętna
           _heartRateSensorHandler.StartListening();
@@ -135,7 +133,7 @@ namespace SenMonitorowanie
                     int x = location[0] - popupWindow.Width; // Wyśrodkuj w poziomie
                     int y = location[1] - popupWindow.Height; // Przesuń menu w górę
                     
-                    popupWindow.ShowAtLocation(fab, GravityFlags.CenterHorizontal, 0, -60);
+                    popupWindow.ShowAtLocation(fab, GravityFlags.CenterHorizontal, 0, 0);
 
                     // Przygotowanie popupView do animacji początkowej
                     popupView.Alpha = 0.0f;
