@@ -76,7 +76,7 @@ namespace SenMonitorowanie
             int ocenaSnu = 0;
 
             /////////////////////////////////////////////////////////////////////////////////////////////////
-            if (selectedHour <= 22 && selectedHour >= 19) ocenaSnu += 1;                                    // odpowiednia pora snu
+            if (selectedHour <= 23 && selectedHour >= 20) ocenaSnu += 1;                                    // odpowiednia pora snu
             if (okraglyCzas >= 9 && okraglyCzas >= 7) ocenaSnu += 1;                                        // odpowiedni czas snu
             if (_databaseManager.GetLatestDane("BazaSnow", "Data") != formattedDate) ocenaSnu += 1;         // nie za duża ilosc snow na dzien 
             if (Int32.Parse(_databaseManager.GetLatestDane("BazaSnow", "Ocena")) >= ocenaSnu) ocenaSnu += 1;// punkty za utrzymanie oceny snu z dnia poprzedniego
