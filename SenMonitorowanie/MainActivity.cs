@@ -85,27 +85,13 @@ namespace SenMonitorowanie
 
 
             mainMonitoringButton = FindViewById<Button>(Resource.Id.startMonitoring);
-
-            // Initialize sensor handler objects
-/*
-            mainMonitoringButton.Click += (sender, e) =>
-            {
-                Console.WriteLine("Button pressed");
-                if (!isMonitoring)
-                {
-                    StartSleepMonitoring();
-                }
-                else
-                {
-                    StopSleepMonitoring();
-                }
-            };*/
+            
         }
 
         public void StartSleepMonitoring()
         {
-            IsMonitoring = true;
-
+            var serviceIntent = new Intent(this, typeof(MyBackgroundService));
+            StartService(serviceIntent);
             // Start listening to sensors
             _accelerometerHandler.StartListening();
             //_audioRecorder.StartRecording();
@@ -115,13 +101,14 @@ namespace SenMonitorowanie
 
         public void StopSleepMonitoring()
         {
-            IsMonitoring = false;
 
             // Stop listening to sensors
             _accelerometerHandler.StopListening();
             //_audioRecorder.StopRecording();
             _heartRateSensorHandler.StopListening();
             _gyroscopeSensorHandler.StopListening();
+            var serviceIntent = new Intent(this, typeof(MyBackgroundService));
+            StopService(serviceIntent);
         }
 
 
@@ -146,6 +133,15 @@ namespace SenMonitorowanie
             //_gyroscopeSensorHandler.StopListening();
 
         }
+
+        protected override void OnDestroy()
+        {
+            // Stop the background service
+            
+
+            base.OnDestroy();
+        }
+
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
@@ -204,7 +200,7 @@ namespace SenMonitorowanie
                     animator.SetInterpolator(new DecelerateInterpolator());
 
 
-                    popupView.FindViewById(Resource.Id.navigation_home).Click += (s, args) => SwitchToMainActivityOnClick();
+                    popupView.FindViewById(Resource.Id.navigation_home).Click += (s, args) => OpenFragmentOnClick(new monitoringScreen());
                     popupView.FindViewById(Resource.Id.navigation_page2).Click += (s, args) => OpenFragmentOnClick(new Page2Fragment(_databaseManager));
                     popupView.FindViewById(Resource.Id.navigation_page3).Click += (s, args) => OpenFragmentOnClick(new Page3Fragment(_databaseManager));
                     popupView.FindViewById(Resource.Id.navigation_page4).Click += (s, args) => OpenFragmentOnClick(new Page4Fragment(_databaseManager));
@@ -236,22 +232,100 @@ namespace SenMonitorowanie
                         isMenuOpen = false;
                     }
 
-                    void SwitchToMainActivityOnClick()
-                    {
-                        Intent intent = new Intent(this, typeof(MainActivity)); // Ustaw właściwy typ Activity
-                        StartActivity(intent);
-                        Finish(); // Opcjonalnie zamknij bieżącą aktywność, jeśli chcesz
-                    }
+                    
 
 
 
                 }
             };
 
-
-           
         }
     }
+
+
+
+    [Service]
+    public class MyBackgroundService : Service
+    {
+        private const int ServiceNotificationId = 1; // Unikalne ID powiadomienia dla Foreground Service
+
+        public override IBinder OnBind(Intent intent)
+        {
+            return null;
+        }
+
+        public override StartCommandResult OnStartCommand(Intent intent, StartCommandFlags flags, int startId)
+        {
+            // Umieść kod, który ma być wykonywany w tle
+
+            // Rozpocznij usługę w pierwszym planie
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+            {
+                StartForegroundOreo();
+            }
+            else
+            {
+                StartForeground(ServiceNotificationId, CreateNotification("Foreground Service", "Service is running"));
+            }
+
+            // Zwróć jeden z kodów wyniku StartCommandResult, na przykład:
+            return StartCommandResult.Sticky;
+        }
+
+        private void StartForegroundOreo()
+        {
+            // Ustawienie kanału powiadomień dla Androida 8.0 i nowszych
+            NotificationChannel channel = new NotificationChannel("channel_id", "Channel Name", NotificationImportance.Default);
+            NotificationManager notificationManager = (NotificationManager)GetSystemService(NotificationService);
+            notificationManager.CreateNotificationChannel(channel);
+
+            // Utworzenie powiadomienia dla Foreground Service
+            Notification notification = new Notification.Builder(this, "channel_id")
+                .SetContentTitle("Foreground Service")
+                .SetContentText("Service is running")
+                .SetSmallIcon(Resource.Drawable.icon) // Zastąp "my_icon" odpowiednią nazwą swojego pliku graficznego
+                .Build();
+
+            // Rozpocznij usługę w pierwszym planie
+            StartForeground(ServiceNotificationId, notification);
+        }
+
+        public override void OnDestroy()
+        {
+            // Zatrzymaj usługę w pierwszym planie, gdy usługa jest zatrzymywana
+            StopForeground(true);
+
+            base.OnDestroy();
+        }
+
+
+        private Notification CreateNotification(string title, string content)
+        {
+            // Utwórz powiadomienie dla Foreground Service
+            Notification.Builder builder;
+
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+            {
+                builder = new Notification.Builder(this, "channel_id");
+            }
+            else
+            {
+                builder = new Notification.Builder(this);
+            }
+
+            builder.SetContentTitle(title)
+                   .SetContentText(content)
+                   .SetSmallIcon(Resource.Drawable.icon) // Zastąp "my_icon" odpowiednią nazwą swojego pliku graficznego
+                   .Build();
+
+            return builder.Build();
+        }
+
+        // Reszta kodu
+    }
+
+
+
 
 
 }
