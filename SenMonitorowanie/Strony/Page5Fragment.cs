@@ -23,7 +23,7 @@ namespace SenMonitorowanie
 
             // Dodaj akcję do przycisku
             ustawienia.Click += (sender, e) => {
-
+                Console.WriteLine();
 
                 Toast.MakeText(Context, "Przycisk został kliknięty", ToastLength.Short).Show();
             };

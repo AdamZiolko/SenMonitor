@@ -32,6 +32,63 @@
             android:layout_centerHorizontal="true"
             android:textColor="#FFFFFF"
             android:text="Statystyki" />
+     <LinearLayout
+         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+            android:background = "#FFFFFF"
+        android:gravity="center"
+        android:padding="20dp"
+            
+            >
+
+             <TextView
+            android:id="@+id/iloscSnow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10dp"
+            android:textStyle="bold"   
+            android:layout_centerHorizontal="true"
+            android:textColor="#000000"
+            android:text="Mierzenie Snu: 100 razy" 
+                /> 
+                
+                <TextView
+            android:id="@+id/sredniaOcena"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10dp"
+            android:textStyle="bold"   
+            android:layout_centerHorizontal="true"
+            android:textColor="#000000"
+            android:text="Srednia ocena snu: 3.44" 
+                />
+
+            <TextView
+            android:id="@+id/senNaDzien"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10dp"
+            android:textStyle="bold"   
+            android:layout_centerHorizontal="true"
+            android:textColor="#000000"
+            android:text="Srednia ilosc snow na dzien: 3.44" 
+                />
+
+            <TextView
+            android:id="@+id/sredniaCzasu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10dp"
+            android:textStyle="bold"   
+            android:layout_centerHorizontal="true"
+            android:textColor="#000000"
+            android:text="Sredni czas snu: 7.44" 
+                />
+
+
+           </LinearLayout>
 
          <Button 
             android:id="@+id/saveButton"

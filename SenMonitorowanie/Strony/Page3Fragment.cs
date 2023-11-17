@@ -14,9 +14,24 @@ namespace SenMonitorowanie
 {
     public class Page3Fragment : Fragment
     {
+
+        private DatabaseManager _databaseManager;
+
+        public Page3Fragment(DatabaseManager databaseManager)
+        {
+            _databaseManager = databaseManager;
+        }
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            return inflater.Inflate(Resource.Layout.fragment_my2, container, false);
+            View view = inflater.Inflate(Resource.Layout.fragment_my2, container, false);
+
+            view.FindViewById<TextView>(Resource.Id.sredniaCzasu).Text = $"Średni czas spania: {(_databaseManager.GetAverageDuration()).ToString("F2")} godzin";
+            view.FindViewById<TextView>(Resource.Id.sredniaOcena).Text = $"Średnia ocena spania: {(_databaseManager.GetAverageRating()).ToString("F2")}";
+            view.FindViewById<TextView>(Resource.Id.iloscSnow).Text = $"Mierzenie spania: {_databaseManager.GetRecordCount()} razy";
+            view.FindViewById<TextView>(Resource.Id.senNaDzien).Text = $"Średnia ilość spania na dzień: {(_databaseManager.GetAverageRecordsPerDate()).ToString("F2")}";
+
+
+            return view;
         }
     }
 }

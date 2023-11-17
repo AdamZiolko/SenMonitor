@@ -16,7 +16,12 @@ namespace SenMonitorowanie
     {
         private ListView listView;
         private ArrayAdapter<string> adapter; // Zmiana typu adaptera na ArrayAdapter<string>
+        private DatabaseManager _databaseManager;
 
+        public Page4Fragment(DatabaseManager databaseManager)
+        {
+            _databaseManager = databaseManager;
+        }
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             View view = inflater.Inflate(Resource.Layout.fragment_my3, container, false);
@@ -35,7 +40,7 @@ namespace SenMonitorowanie
         private void UpdateListView()
         {
             // Tutaj dostarcz swój DatabaseManager (przykładowo za pomocą konstruktora lub wstrzykiwania zależności)
-            DatabaseManager databaseManager = new DatabaseManager(Activity);
+            DatabaseManager databaseManager = _databaseManager;
 
             List<BazaSnowData> daneList = databaseManager.GetLast60DaneSnow();
 

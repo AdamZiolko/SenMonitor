@@ -1,4 +1,5 @@
 ﻿using Android.Content;
+using Android.Database;
 using Android.Database.Sqlite;
 using Android.Util;
 using SenMonitorowanie;
@@ -126,6 +127,64 @@ namespace SenMonitorowanie
                 db.EndTransaction();
             }
         }
+
+        public double GetAverageRating()
+        {
+            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
+            {
+                string query = "SELECT AVG(Ocena) FROM BazaSnow";
+                using (var cursor = db.RawQuery(query, null))
+                {
+                    if (cursor.MoveToFirst())
+                    {
+                        return cursor.GetDouble(0);
+                    }
+                }
+            }
+            return 0; // Zwracamy 0, gdy nie ma rekordów do obliczenia średniej
+        }
+
+        public double GetAverageRecordsPerDate()
+        {
+            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
+            {
+                string query = "SELECT AVG(Cnt) FROM (SELECT COUNT(*) AS Cnt FROM BazaSnow GROUP BY Data)";
+
+                using (var cursor = db.RawQuery(query, null))
+                {
+                    if (cursor.MoveToFirst())
+                    {
+                        return cursor.GetDouble(0);
+                    }
+                }
+            }
+            return 0; // Zwracamy 0, gdy nie ma rekordów
+        }
+
+        public int GetRecordCount()
+        {
+            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
+            {
+                return (int)DatabaseUtils.QueryNumEntries(db, "BazaSnow");
+            }
+        }
+
+        public double GetAverageDuration()
+        {
+            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
+            {
+                string query = "SELECT AVG(CzasTrwania) FROM BazaSnow";
+                using (var cursor = db.RawQuery(query, null))
+                {
+                    if (cursor.MoveToFirst())
+                    {
+                        return cursor.GetDouble(0);
+                    }
+                }
+            }
+            return 0; // Zwracamy 0, gdy nie ma rekordów do obliczenia średniej
+        }
+
 
         public List<BazaSnowData> GetLast60DaneSnow()
         {

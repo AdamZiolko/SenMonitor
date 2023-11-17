@@ -163,8 +163,8 @@ namespace SenMonitorowanie
 
                     popupView.FindViewById(Resource.Id.navigation_home).Click += (s, args) => SwitchToMainActivityOnClick();
                     popupView.FindViewById(Resource.Id.navigation_page2).Click += (s, args) => OpenFragmentOnClick(new Page2Fragment(_databaseManager));
-                    popupView.FindViewById(Resource.Id.navigation_page3).Click += (s, args) => OpenFragmentOnClick(new Page3Fragment());
-                    popupView.FindViewById(Resource.Id.navigation_page4).Click += (s, args) => OpenFragmentOnClick(new Page4Fragment());
+                    popupView.FindViewById(Resource.Id.navigation_page3).Click += (s, args) => OpenFragmentOnClick(new Page3Fragment(_databaseManager));
+                    popupView.FindViewById(Resource.Id.navigation_page4).Click += (s, args) => OpenFragmentOnClick(new Page4Fragment(_databaseManager));
                     popupView.FindViewById(Resource.Id.navigation_page5).Click += (s, args) => OpenFragmentOnClick(new Page5Fragment());
 
                     Window.DecorView.RootView.Click += (s, args) => {popupWindow.Dismiss();};
