@@ -52,7 +52,7 @@ namespace SenMonitorowanie
 
         public string GetLatestDane(string tabela, string kolumna)
         {
-            string data = null;
+            string data = "0";
             using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
             {
                 db.BeginTransaction();
