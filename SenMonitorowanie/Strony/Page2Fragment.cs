@@ -56,21 +56,15 @@ namespace SenMonitorowanie
             int czasZakonczenia = (selectedHour2 * 60 + selectedMinute2) * 60;
 
             // Dodaj godziny i minuty z obu TimePickers
-            if (selectedHour > selectedHour2)
+            if (selectedHour * 60 + selectedMinute >= selectedHour2 * 60 + selectedMinute2 )
             {
-                selectedHour = 24 - selectedHour;
-                selectedMinute = 60 - selectedMinute;
-                czasWMinutach = selectedHour * 60 + selectedHour2 * 60 + selectedMinute2;
-            }
-            else
-            {
+                czasWMinutach = (24 * 60 - (selectedHour * 60 + selectedMinute))  + selectedHour2 * 60 + selectedMinute2;
+            } else {
                 czasWMinutach = selectedHour2 * 60 + selectedMinute2 - (selectedHour * 60 + selectedMinute);
             };
 
-            int godziny = (int)Math.Floor((double)czasWMinutach / 60);
             int okraglyCzas = (int)Math.Round((double)czasWMinutach / 60);
             int czaswSekundach = czasWMinutach * 60;
-            int minuty = czasWMinutach % 60;
 
 
             DateTime currentDate = DateTime.Now;
@@ -81,7 +75,7 @@ namespace SenMonitorowanie
 
             /////////////////////////////////////////////////////////////////////////////////////////////////
             if (selectedHour <= 23 && selectedHour >= 20) ocenaSnu += 1;                                    // odpowiednia pora snu
-            if (okraglyCzas >= 9 && okraglyCzas >= 7) ocenaSnu += 1;                                        // odpowiedni czas snu
+            if (okraglyCzas <= 9 && okraglyCzas >= 7) ocenaSnu += 1;                                        // odpowiedni czas snu
             if (_databaseManager.GetLatestDane("BazaSnow", "Data") != formattedDate) ocenaSnu += 1;         // nie za duża ilosc snow na dzien 
             if (Int32.Parse(_databaseManager.GetLatestDane("BazaSnow", "Ocena")) >= ocenaSnu) ocenaSnu += 1;// punkty za utrzymanie oceny snu z dnia poprzedniego
             ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,8 +83,11 @@ namespace SenMonitorowanie
             ///
             _databaseManager.InsertDaneSnow(formattedDate, czaswSekundach, ocenaSnu, czasPoczatku, czasZakonczenia);
 
+            TimeSpan czasTrwania = TimeSpan.FromSeconds(czaswSekundach);
+            string koncowyCzasTrwania = $"{(int)czasTrwania.TotalHours}:{czasTrwania.Minutes:D2}";
+
             // Wyświetl wybrane wartości godziny i minuty
-            string timeMessage = $"Suma godzin: {godziny}, Suma minut: {minuty}";
+            string timeMessage = $"Suma godzin: {koncowyCzasTrwania}";
             Toast.MakeText(Context, timeMessage, ToastLength.Short).Show();
         }
     }
