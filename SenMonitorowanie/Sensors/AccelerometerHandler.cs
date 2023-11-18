@@ -11,7 +11,7 @@ using Java.Util.Concurrent;
 public class AccelerometerHandler : Java.Lang.Object, ISensorEventListener
 {
     private SensorManager _sensorManager;
-    private TextView _accelerometerDataTextView;
+    private List<float> _accelerometerData; // Change the type to List<List<float>>
     private int counter = 0;
     private DatabaseManager _databaseManager;
     public AccelerometerHandler(SensorManager sensorManager, DatabaseManager databaseManager)
@@ -19,6 +19,8 @@ public class AccelerometerHandler : Java.Lang.Object, ISensorEventListener
         _sensorManager = sensorManager;
        // _accelerometerDataTextView = accelerometerDataTextView;
         _databaseManager = databaseManager;
+        _accelerometerData = new List<float>(); // Initialize as a List<List<float>>
+
     }
 
 
@@ -37,21 +39,38 @@ public class AccelerometerHandler : Java.Lang.Object, ISensorEventListener
         // Zrób coś, gdy zmieni się dokładność czujnika
     }
 
+    public List<float> GetAccelerometerData() // Change the return type
+    {
+        return _accelerometerData;
+    }
+
     public void OnSensorChanged(SensorEvent e)
     {
         if (e.Sensor.Type == SensorType.Accelerometer)
         {
+            float x = e.Values[0];
+            float y = e.Values[1];
+            float z = e.Values[2];
+
+            List<float> accelerometerValues = new List<float> { x, y, z };
+
+            // Add the accelerometer data to the list
+            _accelerometerData = accelerometerValues;
+
             counter += 1;
             if (counter % 20 == 0 && counter != 0)
             {
-                int x = ((int)((e.Values[0] + e.Values[1] + e.Values[2]) * 1000));
-                _databaseManager.InsertSensorData(x.ToString());
-                List<string> last60Data = _databaseManager.GetLast60SensorData();
+                // If you want to insert the average of x, y, and z into the database, you can do something like this:
+                float average = (x + y + z) / 3;
+                _databaseManager.InsertSensorData(average.ToString());
 
-               // _accelerometerDataTextView.Text = string.Join("\n", last60Data); // Wyświetl dane w jednym TextView, każdy w nowej linii
+                // If you want to insert the individual values of x, y, and z into the database, you can do something like this:
+                // _databaseManager.InsertSensorData(x.ToString());
+                // _databaseManager.InsertSensorData(y.ToString());
+                // _databaseManager.InsertSensorData(z.ToString());
+
                 counter = 0;
             }
         }
-
     }
 }

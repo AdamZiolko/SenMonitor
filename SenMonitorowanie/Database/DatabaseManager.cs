@@ -132,6 +132,26 @@ namespace SenMonitorowanie
             }
         }
 
+        public void InsertDaneSensorowe(string dateTime, float accX, float accY, float accZ, float gyrX, float gyrY, float gyrZ, float heartRate)
+        {
+            using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
+            {
+                db.BeginTransaction();
+                ContentValues values = new ContentValues();
+                values.Put("date_time", dateTime);
+                values.Put("acc_x", accX);
+                values.Put("acc_y", accY);
+                values.Put("acc_z", accZ);
+                values.Put("gyr_x", gyrX);
+                values.Put("gyr_y", gyrY);
+                values.Put("gyr_z", gyrZ);
+                values.Put("heart_rate", heartRate);
+                db.InsertOrThrow("DaneSensorowe", null, values);
+                db.SetTransactionSuccessful();
+                db.EndTransaction();
+            }
+        }
+
 
         public double GetAverageRating()
         {
@@ -238,6 +258,33 @@ namespace SenMonitorowanie
                 }
                 finally
                 {
+                    db.EndTransaction();
+                }
+            }
+        }
+
+
+        public void ClearAllDaneSensoroweData()
+        {
+            using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
+            {
+                db.BeginTransaction();
+                try
+                {
+                    // Usuwanie wszystkich rekordów z tabeli "DaneSensorowe"
+                    db.Delete("DaneSensorowe", null, null);
+
+                    // Ustawianie transakcji jako udanej
+                    db.SetTransactionSuccessful();
+                }
+                catch (Exception ex)
+                {
+                    // Obsługa błędów, np. logowanie błędu
+                    Console.WriteLine("Error clearing DaneSensorowe data: " + ex.Message);
+                }
+                finally
+                {
+                    // Zakończenie transakcji
                     db.EndTransaction();
                 }
             }

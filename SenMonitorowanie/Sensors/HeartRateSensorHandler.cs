@@ -6,7 +6,7 @@ namespace SenMonitorowanie
     public class HeartRateSensorHandler
     {
         private SensorManager _sensorManager;
-        private ISensorEventListener _heartRateSensorListener;
+        private HeartRateSensorListener _heartRateSensorListener;
         private DatabaseManager _databaseManager;
 
         public HeartRateSensorHandler(SensorManager sensorManager, DatabaseManager databaseManager)
@@ -16,7 +16,7 @@ namespace SenMonitorowanie
 
             // Pobierz czujnik tętna
             Sensor heartRateSensor = _sensorManager.GetDefaultSensor(SensorType.HeartRate);
-            Console.WriteLine("HeartRateSensorHandler");
+            //Console.WriteLine("HeartRateSensorHandler");
             if (heartRateSensor == null)
             {
                 // Obsługa braku dostępnego czujnika tętna
@@ -30,11 +30,11 @@ namespace SenMonitorowanie
 
         public void StartListening()
         {
-            Console.WriteLine("StartListeningPoczatek");
+            //Console.WriteLine("StartListeningPoczatek");
 
             if (_heartRateSensorListener != null)
             {
-                Console.WriteLine("StartListeningKoniec");
+                //Console.WriteLine("StartListeningKoniec");
 
                 // Rozpocznij nasłuchiwanie czujnika tętna
                 _sensorManager.RegisterListener(_heartRateSensorListener, _sensorManager.GetDefaultSensor(SensorType.HeartRate), SensorDelay.Normal);
@@ -43,11 +43,11 @@ namespace SenMonitorowanie
 
         public void StopListening()
         {
-            Console.WriteLine("StopListeningPoczatek");
+            //Console.WriteLine("StopListeningPoczatek");
 
             if (_heartRateSensorListener != null)
             {
-                Console.WriteLine("StopListeningKoniec");
+                //Console.WriteLine("StopListeningKoniec");
 
                 // Zatrzymaj nasłuchiwanie czujnika tętna
                 _sensorManager.UnregisterListener(_heartRateSensorListener);
@@ -57,6 +57,7 @@ namespace SenMonitorowanie
         // Klasa do obsługi odczytów z czujnika tętna
         private class HeartRateSensorListener : Java.Lang.Object, ISensorEventListener
         {
+            private float heartRate = 0;
             public void OnAccuracyChanged(Sensor sensor, SensorStatus accuracy)
             {
                 // Niepotrzebne dla tętna
@@ -64,10 +65,10 @@ namespace SenMonitorowanie
 
             public void OnSensorChanged(SensorEvent e)
             {
-                Console.WriteLine("czujnikSercaDziała");
+                //Console.WriteLine("czujnikSercaDziała");
                 if (e.Sensor.Type == SensorType.HeartRate)
                 {
-                    float heartRate = e.Values[0];
+                    heartRate = e.Values[0];
                     UpdateHeartRate(heartRate);
                 }
             }
@@ -75,8 +76,18 @@ namespace SenMonitorowanie
             private void UpdateHeartRate(float heartRate)
             {
                 // Aktualizuj wartość na konsoli
-                Console.WriteLine("Heart Rate: " + heartRate.ToString());
+                //Console.WriteLine("Heart Rate: " + heartRate.ToString());
             }
+
+            public float getActualData()
+            {
+                return heartRate;
+            }
+        }
+
+        public float getActualData()
+        {
+            return _heartRateSensorListener.getActualData();
         }
     }
 }

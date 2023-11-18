@@ -13,6 +13,8 @@ using Android.Views;
 using static Android.App.FragmentManager;
 using AndroidX.AppCompat.Widget;
 using Android.Content;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SenMonitorowanie
 {
@@ -30,6 +32,7 @@ namespace SenMonitorowanie
         //private AudioRecorder _audioRecorder;
         private HeartRateSensorHandler _heartRateSensorHandler; // Dodanie obsługi czujnika tętna
         private GyroscopeSensorHandler _gyroscopeSensorHandler;
+        System.Timers.Timer timer = new System.Timers.Timer();
 
 
         public bool IsMonitoring = false;
@@ -88,6 +91,29 @@ namespace SenMonitorowanie
             
         }
 
+        Task HandleTimerAsync()
+        {
+            Console.WriteLine("Interval Called");
+
+            List<float> accelerometerData = _accelerometerHandler.GetAccelerometerData();
+            float heartRateData = _heartRateSensorHandler.getActualData();
+            List<float> gyroscopeData = _gyroscopeSensorHandler.GetGyroscopeData();
+
+
+            DateTime currentDate = DateTime.Now;
+            string collectionTime = currentDate.ToString("yyyy-MM-dd H:mm:ss");
+
+            //foreach (List<float> data in accelerometerData)
+            //{
+            Console.WriteLine($"Data pobrania : {collectionTime} AX: {accelerometerData[0]}, AY: {accelerometerData[1]}, AZ: {accelerometerData[2]}, heart: {heartRateData}, Gx: {gyroscopeData[0]}, Gy: {gyroscopeData[1]}, Gz: {gyroscopeData[2]},");
+            Console.WriteLine(_databaseManager.GetLatestDane("DaneSensorowe", "date_time"));
+            _databaseManager.InsertDaneSensorowe(collectionTime, accelerometerData[0], accelerometerData[1], accelerometerData[2], heartRateData, gyroscopeData[0], gyroscopeData[1], gyroscopeData[2]);
+            //_databaseManager.InsertDaneSensorowe();
+            //}
+            // Your async logic here.
+            return Task.CompletedTask;
+        }
+
         public void StartSleepMonitoring()
         {
             var serviceIntent = new Intent(this, typeof(MyBackgroundService));
@@ -97,18 +123,28 @@ namespace SenMonitorowanie
             //_audioRecorder.StartRecording();
             _heartRateSensorHandler.StartListening();
             _gyroscopeSensorHandler.StartListening();
+
+
+
+
+            timer.Interval = 10000; // co jaki czas dane są zbierane w milisekundach
+            timer.Elapsed += async (sender, e) => await HandleTimerAsync();
+            timer.Start();
         }
 
         public void StopSleepMonitoring()
         {
+            timer.Stop();
 
             // Stop listening to sensors
             _accelerometerHandler.StopListening();
             //_audioRecorder.StopRecording();
             _heartRateSensorHandler.StopListening();
             _gyroscopeSensorHandler.StopListening();
+
             var serviceIntent = new Intent(this, typeof(MyBackgroundService));
             StopService(serviceIntent);
+            _databaseManager.ClearAllDaneSensoroweData();
         }
 
 
@@ -117,7 +153,7 @@ namespace SenMonitorowanie
         {
             base.OnResume();
 
-
+            
             //_accelerometerHandler.StartListening();
             // _audioRecorder.StartRecording();
            // _heartRateSensorHandler.StartListening(); // Rozpocznij nasłuchiwanie czujnika tętna

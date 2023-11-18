@@ -52,8 +52,8 @@ namespace SenMonitorowanie
                 int dokładnyCzas = dane.CzasTrwania;
                 TimeSpan czasTrwania = TimeSpan.FromSeconds(dokładnyCzas);
                 string koncowyCzasTrwania = $"{(int)czasTrwania.TotalHours}:{czasTrwania.Minutes:D2}";
-                Console.WriteLine(dane.CzasPoczatku);
-                Console.WriteLine(dane.CzasZakonczenia);
+                Console.WriteLine("Czas Poczatku: " + dane.CzasPoczatku);
+                Console.WriteLine("Czas Zakończenia: " + dane.CzasZakonczenia);
 
                 string formattedData = $"{dane.Data,-15}  {koncowyCzasTrwania,-5}  {dane.Ocena,-5}";
                 adapter.Add(formattedData);
