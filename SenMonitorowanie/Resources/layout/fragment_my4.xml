@@ -34,12 +34,12 @@
             android:text="Ustawienia" />
         <Button 
             android:id="@+id/Ustawione"
-            android:layout_width="70dp"
-            android:layout_height="30dp"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
             android:layout_below="@+id/heightTextView"
             android:layout_centerHorizontal="true"
-            android:textSize="7dp"        
-            android:text="Zapisz" />
+            android:textSize="9dp"        
+            android:text="Resetuj wszystkie dane." />
         
     </LinearLayout>
     

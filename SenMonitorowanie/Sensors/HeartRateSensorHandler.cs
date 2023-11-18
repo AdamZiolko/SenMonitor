@@ -7,10 +7,12 @@ namespace SenMonitorowanie
     {
         private SensorManager _sensorManager;
         private ISensorEventListener _heartRateSensorListener;
+        private DatabaseManager _databaseManager;
 
-        public HeartRateSensorHandler(SensorManager sensorManager)
+        public HeartRateSensorHandler(SensorManager sensorManager, DatabaseManager databaseManager)
         {
             _sensorManager = sensorManager;
+            _databaseManager = databaseManager;
 
             // Pobierz czujnik tętna
             Sensor heartRateSensor = _sensorManager.GetDefaultSensor(SensorType.HeartRate);

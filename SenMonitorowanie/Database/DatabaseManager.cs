@@ -4,6 +4,8 @@ using Android.Database.Sqlite;
 using Android.Util;
 using SenMonitorowanie;
 using System.Collections.Generic;
+using System;
+
 
 namespace SenMonitorowanie
 {
@@ -113,7 +115,7 @@ namespace SenMonitorowanie
             }
         }
 
-        public void InsertDaneSnow(string data, int czasTrwania, int ocena)
+        public void InsertDaneSnow(string data, int czasTrwania, int ocena, int czasPoczatku, int czasZakonczenia)
         {
             using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
             {
@@ -122,11 +124,14 @@ namespace SenMonitorowanie
                 values.Put("Data", data);
                 values.Put("CzasTrwania", czasTrwania);
                 values.Put("Ocena", ocena);
-                db.InsertOrThrow("BazaSnow", null, values);  // Zmiana na "BazaSnow" zamiast "SensorData"
+                values.Put("CzasPoczatku", czasPoczatku); // Dodane do wstawienia CzasPoczatku
+                values.Put("CzasZakonczenia", czasZakonczenia); // Dodane do wstawienia CzasZakonczenia
+                db.InsertOrThrow("BazaSnow", null, values);
                 db.SetTransactionSuccessful();
                 db.EndTransaction();
             }
         }
+
 
         public double GetAverageRating()
         {
@@ -192,7 +197,7 @@ namespace SenMonitorowanie
             using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
             {
                 db.BeginTransaction();
-                string query = "SELECT Data, CzasTrwania, Ocena FROM BazaSnow ORDER BY Id DESC LIMIT 60";
+                string query = "SELECT Data, CzasTrwania, Ocena, CzasPoczatku, CzasZakonczenia FROM BazaSnow ORDER BY Id DESC LIMIT 60";
                 using (var cursor = db.RawQuery(query, null))
                 {
                     while (cursor.MoveToNext())
@@ -201,7 +206,9 @@ namespace SenMonitorowanie
                         {
                             Data = cursor.GetString(cursor.GetColumnIndex("Data")),
                             CzasTrwania = cursor.GetInt(cursor.GetColumnIndex("CzasTrwania")),
-                            Ocena = cursor.GetInt(cursor.GetColumnIndex("Ocena"))
+                            Ocena = cursor.GetInt(cursor.GetColumnIndex("Ocena")),
+                            CzasPoczatku = cursor.GetInt(cursor.GetColumnIndex("CzasPoczatku")),
+                            CzasZakonczenia = cursor.GetInt(cursor.GetColumnIndex("CzasZakonczenia"))
                         };
 
                         data.Add(dane);
@@ -212,5 +219,30 @@ namespace SenMonitorowanie
             }
             return data;
         }
+
+        public void ClearAllBazaSnowData()
+        {
+            using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
+            {
+                db.BeginTransaction();
+                try
+                {
+                    string clearQuery = "DELETE FROM BazaSnow";
+                    db.ExecSQL(clearQuery);
+                    db.SetTransactionSuccessful();
+                }
+                catch (Exception ex)
+                {
+                    // Obsługa wyjątku, jeśli to konieczne
+                    Console.WriteLine($"Error clearing BazaSnow table: {ex.Message}");
+                }
+                finally
+                {
+                    db.EndTransaction();
+                }
+            }
+        }
+
     }
+
 }

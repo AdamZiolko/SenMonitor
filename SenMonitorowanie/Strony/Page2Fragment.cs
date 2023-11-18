@@ -52,6 +52,9 @@ namespace SenMonitorowanie
             int selectedHour2 = timePicker2.Hour;
             int selectedMinute2 = timePicker2.Minute;
             int czasWMinutach = 0;
+            int czasPoczatku = (selectedHour * 60 + selectedMinute) * 60;
+            int czasZakonczenia = (selectedHour2 * 60 + selectedMinute2) * 60;
+
             // Dodaj godziny i minuty z obu TimePickers
             if (selectedHour > selectedHour2)
             {
@@ -66,13 +69,14 @@ namespace SenMonitorowanie
 
             int godziny = (int)Math.Floor((double)czasWMinutach / 60);
             int okraglyCzas = (int)Math.Round((double)czasWMinutach / 60);
+            int czaswSekundach = czasWMinutach * 60;
             int minuty = czasWMinutach % 60;
 
 
             DateTime currentDate = DateTime.Now;
 
             // Konwertuj datę na łańcuch tekstowy w formacie "yyyy-MM-dd"
-            string formattedDate = currentDate.ToString("yyyy-MM-dd");
+            string formattedDate = currentDate.ToString("yyyy-MM-dd H:mm:ss");
             int ocenaSnu = 0;
 
             /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,7 +86,8 @@ namespace SenMonitorowanie
             if (Int32.Parse(_databaseManager.GetLatestDane("BazaSnow", "Ocena")) >= ocenaSnu) ocenaSnu += 1;// punkty za utrzymanie oceny snu z dnia poprzedniego
             ////////////////////////////////////////////////////////////////////////////////////////////////
 
-            _databaseManager.InsertDaneSnow(formattedDate, okraglyCzas, ocenaSnu);
+            ///
+            _databaseManager.InsertDaneSnow(formattedDate, czaswSekundach, ocenaSnu, czasPoczatku, czasZakonczenia);
 
             // Wyświetl wybrane wartości godziny i minuty
             string timeMessage = $"Suma godzin: {godziny}, Suma minut: {minuty}";

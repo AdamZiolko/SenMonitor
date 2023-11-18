@@ -51,7 +51,7 @@ namespace SenMonitorowanie
 
           _accelerometerHandler = new AccelerometerHandler(_sensorManager, _databaseManager);
            //_audioRecorder = new AudioRecorder(_volumeLevelTextView);
-          _heartRateSensorHandler = new HeartRateSensorHandler(_sensorManager); // Inicjalizacja obsługi czujnika tętna
+          _heartRateSensorHandler = new HeartRateSensorHandler(_sensorManager, _databaseManager); // Inicjalizacja obsługi czujnika tętna
          _gyroscopeSensorHandler = new GyroscopeSensorHandler(_sensorManager, _databaseManager);
             //////////////// Baza danych ///////////////////////////////////////////////////////////////////////////////////////////////
             //string dataToSave = "Twoje dane do zapisania";
@@ -204,7 +204,7 @@ namespace SenMonitorowanie
                     popupView.FindViewById(Resource.Id.navigation_page2).Click += (s, args) => OpenFragmentOnClick(new Page2Fragment(_databaseManager));
                     popupView.FindViewById(Resource.Id.navigation_page3).Click += (s, args) => OpenFragmentOnClick(new Page3Fragment(_databaseManager));
                     popupView.FindViewById(Resource.Id.navigation_page4).Click += (s, args) => OpenFragmentOnClick(new Page4Fragment(_databaseManager));
-                    popupView.FindViewById(Resource.Id.navigation_page5).Click += (s, args) => OpenFragmentOnClick(new Page5Fragment());
+                    popupView.FindViewById(Resource.Id.navigation_page5).Click += (s, args) => OpenFragmentOnClick(new Page5Fragment(_databaseManager));
 
                     Window.DecorView.RootView.Click += (s, args) => {popupWindow.Dismiss();};
                     isMenuOpen = true;

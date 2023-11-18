@@ -36,8 +36,7 @@
             android:paddingRight="4dp"
             android:layout_width="130dp"
             android:layout_height="80dp"
-            android:radius="10dp"
-          
+             android:background="@drawable/main_button"
             android:layout_centerHorizontal="true"
             android:text="Start Mierzenia Snu"
             android:textSize="18dp" />

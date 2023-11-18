@@ -49,9 +49,13 @@ namespace SenMonitorowanie
 
             foreach (var dane in daneList)
             {
-                int kolumna1 = 10 - dane.Data.Length;
+                int dokładnyCzas = dane.CzasTrwania;
+                TimeSpan czasTrwania = TimeSpan.FromSeconds(dokładnyCzas);
+                string koncowyCzasTrwania = $"{(int)czasTrwania.TotalHours}:{czasTrwania.Minutes:D2}";
+                Console.WriteLine(dane.CzasPoczatku);
+                Console.WriteLine(dane.CzasZakonczenia);
 
-                string formattedData = $"{dane.Data,-15}  {dane.CzasTrwania,-5}  {dane.Ocena,-5}";
+                string formattedData = $"{dane.Data,-15}  {koncowyCzasTrwania,-5}  {dane.Ocena,-5}";
                 adapter.Add(formattedData);
             }
 
@@ -68,5 +72,7 @@ namespace SenMonitorowanie
         public string Data { get; set; }
         public int CzasTrwania { get; set; }
         public int Ocena { get; set; }
+        public int CzasPoczatku { get; set; } // Dodana właściwość CzasPoczatku
+        public int CzasZakonczenia { get; set; } // Dodana właściwość CzasZakonczenia
     }
 }
