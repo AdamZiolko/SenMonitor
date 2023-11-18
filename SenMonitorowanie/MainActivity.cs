@@ -32,7 +32,7 @@ namespace SenMonitorowanie
         //private AudioRecorder _audioRecorder;
         private HeartRateSensorHandler _heartRateSensorHandler; // Dodanie obsługi czujnika tętna
         private GyroscopeSensorHandler _gyroscopeSensorHandler;
-        System.Timers.Timer timer = new System.Timers.Timer();
+        System.Timers.Timer timer;
 
 
         public bool IsMonitoring = false;
@@ -56,14 +56,7 @@ namespace SenMonitorowanie
            //_audioRecorder = new AudioRecorder(_volumeLevelTextView);
           _heartRateSensorHandler = new HeartRateSensorHandler(_sensorManager, _databaseManager); // Inicjalizacja obsługi czujnika tętna
          _gyroscopeSensorHandler = new GyroscopeSensorHandler(_sensorManager, _databaseManager);
-            //////////////// Baza danych ///////////////////////////////////////////////////////////////////////////////////////////////
-            //string dataToSave = "Twoje dane do zapisania";
-            //_databaseManager.InsertSensorData(dataToSave);
-            //_databaseManager.InsertSensorData("Dane z bazy danych");
-            //string latestData = _databaseManager.GetLatestSensorData();
-            //_daneZBazy = FindViewById<TextView>(Resource.Id.daneZBazy);
-            //_daneZBazy.Text = latestData;
-            _databaseManager.ClearAllData();
+
             SetAmbientEnabled();
 
             FragmentManager fragmentManager = FragmentManager;
@@ -87,9 +80,9 @@ namespace SenMonitorowanie
             SetupFloatingActionButtonMenu();
 
 
-            mainMonitoringButton = FindViewById<Button>(Resource.Id.startMonitoring);
             
         }
+        private readonly object databaseLock = new object();
 
         Task HandleTimerAsync()
         {
@@ -102,17 +95,23 @@ namespace SenMonitorowanie
 
             DateTime currentDate = DateTime.Now;
             string collectionTime = currentDate.ToString("yyyy-MM-dd H:mm:ss");
+            // Console.WriteLine(_databaseManager.GetLatestDane("DaneSensorowe", "heart_rate"));
 
             //foreach (List<float> data in accelerometerData)
             //{
-            Console.WriteLine($"Data pobrania : {collectionTime} AX: {accelerometerData[0]}, AY: {accelerometerData[1]}, AZ: {accelerometerData[2]}, heart: {heartRateData}, Gx: {gyroscopeData[0]}, Gy: {gyroscopeData[1]}, Gz: {gyroscopeData[2]},");
-            Console.WriteLine(_databaseManager.GetLatestDane("DaneSensorowe", "date_time"));
-            _databaseManager.InsertDaneSensorowe(collectionTime, accelerometerData[0], accelerometerData[1], accelerometerData[2], heartRateData, gyroscopeData[0], gyroscopeData[1], gyroscopeData[2]);
+            lock (databaseLock){
+                Console.WriteLine($"Data pobrania : {collectionTime} AX: {accelerometerData[0]}, AY: {accelerometerData[1]}, AZ: {accelerometerData[2]}, heart: {heartRateData}, Gx: {gyroscopeData[0]}, Gy: {gyroscopeData[1]}, Gz: {gyroscopeData[2]},");
+                _databaseManager.InsertDaneSensorowe(collectionTime, accelerometerData[0], accelerometerData[1], accelerometerData[2], gyroscopeData[0], gyroscopeData[1], gyroscopeData[2], heartRateData);
+            }
             //_databaseManager.InsertDaneSensorowe();
             //}
             // Your async logic here.
+            //Console.WriteLine($"MAX heartate: {_databaseManager.GetMaxHeartRate()} MIN heartate: {_databaseManager.GetMinHeartRate()} AVG heartate: {_databaseManager.GetAverageHeartRate()}");
+
             return Task.CompletedTask;
         }
+
+        private bool isTimerRunning = false;
 
         public void StartSleepMonitoring()
         {
@@ -125,26 +124,41 @@ namespace SenMonitorowanie
             _gyroscopeSensorHandler.StartListening();
 
 
+            if (isTimerRunning && timer != null)
+            {
+                timer.Stop();
+                timer.Dispose(); // Zwolnienie zasobów starego timera
+            }
 
-
-            timer.Interval = 10000; // co jaki czas dane są zbierane w milisekundach
-            timer.Elapsed += async (sender, e) => await HandleTimerAsync();
-            timer.Start();
+            if (!isTimerRunning)
+            {
+                timer = new System.Timers.Timer();
+                timer.Interval = 3000; // co jaki czas dane są zbierane w milisekundach
+                timer.Elapsed += async (sender, e) => await HandleTimerAsync();
+                timer.Start();
+                isTimerRunning = true;
+            }
         }
 
         public void StopSleepMonitoring()
         {
-            timer.Stop();
+            if (isTimerRunning)
+            {
+                timer.Stop();
+                timer.Dispose();
+                isTimerRunning = false;
 
-            // Stop listening to sensors
-            _accelerometerHandler.StopListening();
-            //_audioRecorder.StopRecording();
-            _heartRateSensorHandler.StopListening();
-            _gyroscopeSensorHandler.StopListening();
+                Console.WriteLine($"MAX heartate: {_databaseManager.GetMaxHeartRate()} MIN heartate: {_databaseManager.GetMinHeartRate()} AVG heartate: {_databaseManager.GetAverageHeartRate()}");
+                // Stop listening to sensors
+                _accelerometerHandler.StopListening();
+                //_audioRecorder.StopRecording();
+                _heartRateSensorHandler.StopListening();
+                _gyroscopeSensorHandler.StopListening();
 
-            var serviceIntent = new Intent(this, typeof(MyBackgroundService));
-            StopService(serviceIntent);
-            _databaseManager.ClearAllDaneSensoroweData();
+                var serviceIntent = new Intent(this, typeof(MyBackgroundService));
+                StopService(serviceIntent);
+                _databaseManager.ClearAllDaneSensoroweData();
+            }
         }
 
 

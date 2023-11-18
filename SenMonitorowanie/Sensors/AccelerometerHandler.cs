@@ -57,20 +57,6 @@ public class AccelerometerHandler : Java.Lang.Object, ISensorEventListener
             // Add the accelerometer data to the list
             _accelerometerData = accelerometerValues;
 
-            counter += 1;
-            if (counter % 20 == 0 && counter != 0)
-            {
-                // If you want to insert the average of x, y, and z into the database, you can do something like this:
-                float average = (x + y + z) / 3;
-                _databaseManager.InsertSensorData(average.ToString());
-
-                // If you want to insert the individual values of x, y, and z into the database, you can do something like this:
-                // _databaseManager.InsertSensorData(x.ToString());
-                // _databaseManager.InsertSensorData(y.ToString());
-                // _databaseManager.InsertSensorData(z.ToString());
-
-                counter = 0;
-            }
         }
     }
 }

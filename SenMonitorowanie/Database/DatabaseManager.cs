@@ -19,38 +19,8 @@ namespace SenMonitorowanie
             _databaseHelper = new DatabaseHelper(context);
         }
 
-        public void InsertSensorData(string data)
-        {
-            using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
-            {
-                db.BeginTransaction();
-                ContentValues values = new ContentValues();
-                values.Put("Data", data);
-                db.InsertOrThrow("SensorData", null, values);
-                db.SetTransactionSuccessful();
-                db.EndTransaction();
-            }
-        }
 
-        public string GetLatestSensorData()
-        {
-            string data = null;
-            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
-            {
-                db.BeginTransaction();
-                string query = "SELECT Data FROM SensorData ORDER BY Id DESC LIMIT 1";
-                using (var cursor = db.RawQuery(query, null))
-                {
-                    if (cursor.MoveToFirst())
-                    {
-                        data = cursor.GetString(cursor.GetColumnIndex("Data"));
-                    }
-                }
-                db.SetTransactionSuccessful();
-                db.EndTransaction();
-            }
-            return data;
-        }
+
 
         public string GetLatestDane(string tabela, string kolumna)
         {
@@ -72,48 +42,9 @@ namespace SenMonitorowanie
             return data;
         }
 
-        public List<string> GetLast60SensorData()
-        {
-            List<string> data = new List<string>();
-            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
-            {
-                db.BeginTransaction();
-                string query = "SELECT Data FROM SensorData ORDER BY Id DESC LIMIT 5";
-                using (var cursor = db.RawQuery(query, null))
-                {
-                    while (cursor.MoveToNext())
-                    {
-                        data.Add(cursor.GetString(cursor.GetColumnIndex("Data")));
-                    }
-                }
-                db.SetTransactionSuccessful();
-                db.EndTransaction();
-            }
-            return data;
-        }
 
-        public void ClearOldData()
-        {
-            using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
-            {
-                db.BeginTransaction();
-                string query = "DELETE FROM SensorData WHERE Id NOT IN (SELECT Id FROM SensorData ORDER BY Id DESC LIMIT 6)";
-                db.ExecSQL(query);
-                db.SetTransactionSuccessful();
-                db.EndTransaction();
-            }
-        }
 
-        public void ClearAllData()
-        {
-            using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
-            {
-                db.BeginTransaction();
-                db.Delete("SensorData", null, null);
-                db.SetTransactionSuccessful();
-                db.EndTransaction();
-            }
-        }
+
 
         public void InsertDaneSnow(string data, int czasTrwania, int ocena, int czasPoczatku, int czasZakonczenia)
         {
@@ -288,6 +219,54 @@ namespace SenMonitorowanie
                     db.EndTransaction();
                 }
             }
+        }
+
+        public double GetMaxHeartRate()
+        {
+            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
+            {
+                string query = "SELECT MAX(heart_rate) FROM DaneSensorowe";
+                using (var cursor = db.RawQuery(query, null))
+                {
+                    if (cursor.MoveToFirst())
+                    {
+                        return cursor.GetDouble(0);
+                    }
+                }
+            }
+            return 0; // Return 0 if there are no records
+        }
+
+        public double GetMinHeartRate()
+        {
+            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
+            {
+                string query = "SELECT MIN(heart_rate) FROM DaneSensorowe";
+                using (var cursor = db.RawQuery(query, null))
+                {
+                    if (cursor.MoveToFirst())
+                    {
+                        return cursor.GetDouble(0);
+                    }
+                }
+            }
+            return 0; // Return 0 if there are no records
+        }
+
+        public double GetAverageHeartRate()
+        {
+            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
+            {
+                string query = "SELECT AVG(heart_rate) FROM DaneSensorowe";
+                using (var cursor = db.RawQuery(query, null))
+                {
+                    if (cursor.MoveToFirst())
+                    {
+                        return cursor.GetDouble(0);
+                    }
+                }
+            }
+            return 0; // Return 0 if there are no records
         }
 
     }

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using Android.App;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace SenMonitorowanie
 {
@@ -30,9 +31,11 @@ namespace SenMonitorowanie
             // Znajdź przycisk w fragmencie
             _fragmentMonitoringButton = view.FindViewById<Button>(Resource.Id.startMonitoring);
             _fragmentMonitoringButton.Text = !_mainActivity.IsMonitoring ? "Start Sleep Monitoring" : "Stop Sleep Monitoring";
-            _fragmentMonitoringButton.Click += (sender, e) =>
+            _fragmentMonitoringButton.Click += async (sender, e) =>
             {
                 Console.WriteLine("Button pressed from Fragment");
+                _fragmentMonitoringButton.Enabled = false;
+
                 if (!_mainActivity.IsMonitoring)
                 {
                     //stopwatch.Start();
@@ -59,9 +62,20 @@ namespace SenMonitorowanie
 
 
                 }
+
+                await DelayAsync(1000);
+
+                // Odblokuj przycisk po 5 sekundach
+                _fragmentMonitoringButton.Enabled = true;
             };
 
+            // Metoda asynchroniczna do opóźnienia
+            
             return view;
+        }
+        private async Task DelayAsync(int milliseconds)
+        {
+            await Task.Delay(milliseconds);
         }
     }
 }
