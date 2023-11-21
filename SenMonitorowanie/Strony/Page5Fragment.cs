@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Android.App;
+using Android.Graphics;
 
 namespace SenMonitorowanie
 {
@@ -34,6 +35,15 @@ namespace SenMonitorowanie
             };
 
             return view;
+        }
+    }
+
+    public static class FontManager
+    {
+        public static void SetFont(TextView textView, Context context, string fontPath)
+        {
+            Typeface typeface = Typeface.CreateFromAsset(context.Assets, fontPath);
+            textView.Typeface = typeface;
         }
     }
 }

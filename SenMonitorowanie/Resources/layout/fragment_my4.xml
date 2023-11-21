@@ -40,6 +40,13 @@
             android:layout_centerHorizontal="true"
             android:textSize="9dp"        
             android:text="Resetuj wszystkie dane." />
+        <Button
+            android:id="@+id/toggleFontButton"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:text="Zmień czcionkę"
+            android:textSize="9dp" 
+            android:layout_gravity="center"/>
         
     </LinearLayout>
     

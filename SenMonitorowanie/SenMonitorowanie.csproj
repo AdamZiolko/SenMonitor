@@ -69,6 +69,7 @@
     <Compile Include="Strony\Page5Fragment.cs" />
   </ItemGroup>
   <ItemGroup>
+    <AndroidAsset Include="Assets\font_regular.ttf" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
     <None Include="Properties\AndroidManifest.xml" />
