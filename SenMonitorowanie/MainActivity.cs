@@ -25,9 +25,9 @@ namespace SenMonitorowanie
         private SensorManager _sensorManager;
         private DatabaseManager _databaseManager;
 
-        private TextView _accelerometerDataTextView;
+       // private TextView _accelerometerDataTextView;
         // private TextView _volumeLevelTextView;
-        private TextView _heartRateTextView; // Deklaracja TextView dla tętna
+        //private TextView _heartRateTextView; // Deklaracja TextView dla tętna
         private AccelerometerHandler _accelerometerHandler;
         //private AudioRecorder _audioRecorder;
         private HeartRateSensorHandler _heartRateSensorHandler; // Dodanie obsługi czujnika tętna
@@ -36,7 +36,7 @@ namespace SenMonitorowanie
 
 
         public bool IsMonitoring = false;
-        private Button mainMonitoringButton;
+        //private Button mainMonitoringButton;
 
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -133,7 +133,7 @@ namespace SenMonitorowanie
             if (!isTimerRunning)
             {
                 timer = new System.Timers.Timer();
-                timer.Interval = 3000; // co jaki czas dane są zbierane w milisekundach
+                timer.Interval = 1000; // co jaki czas dane są zbierane w milisekundach
                 timer.Elapsed += async (sender, e) => await HandleTimerAsync();
                 timer.Start();
                 isTimerRunning = true;
@@ -149,6 +149,15 @@ namespace SenMonitorowanie
                 isTimerRunning = false;
 
                 Console.WriteLine($"MAX heartate: {_databaseManager.GetMaxHeartRate()} MIN heartate: {_databaseManager.GetMinHeartRate()} AVG heartate: {_databaseManager.GetAverageHeartRate()}");
+
+                List<double> extremeHeartRates = _databaseManager.GetExtremeHeartRates();
+
+                for (int i = 0; i < extremeHeartRates.Count; i++)
+                {
+                    double heartRate = extremeHeartRates[i];
+                    Console.WriteLine($"Element {i + 1}: Heart Rate: {heartRate}");
+                }
+
                 // Stop listening to sensors
                 _accelerometerHandler.StopListening();
                 //_audioRecorder.StopRecording();

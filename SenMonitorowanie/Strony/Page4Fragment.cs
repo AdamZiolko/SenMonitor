@@ -25,6 +25,7 @@ namespace SenMonitorowanie
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             View view = inflater.Inflate(Resource.Layout.fragment_my3, container, false);
+            ViewHelper.SetFontForAllViews(view, Activity);
 
             // Inicjalizacja ListView i ArrayAdapter<string>
             listView = view.FindViewById<ListView>(Resource.Id.wypisDanych);

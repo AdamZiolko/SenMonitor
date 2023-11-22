@@ -22,6 +22,7 @@ namespace SenMonitorowanie
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             View view = inflater.Inflate(Resource.Layout.monitoringScreen, container, false);
+            ViewHelper.SetFontForAllViews(view, Activity);
 
             _mainActivity = (MainActivity)Activity;
 

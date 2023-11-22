@@ -24,6 +24,7 @@ namespace SenMonitorowanie
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             View view = inflater.Inflate(Resource.Layout.fragment_my2, container, false);
+            ViewHelper.SetFontForAllViews(view, Activity);
 
             view.FindViewById<TextView>(Resource.Id.sredniaCzasu).Text = $"Średni czas spania: {(_databaseManager.GetAverageDuration()/3600).ToString("F2")} godzin";
             view.FindViewById<TextView>(Resource.Id.sredniaOcena).Text = $"Średnia ocena spania: {(_databaseManager.GetAverageRating()).ToString("F2")}";

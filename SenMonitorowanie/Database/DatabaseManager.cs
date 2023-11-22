@@ -269,6 +269,52 @@ namespace SenMonitorowanie
             return 0; // Return 0 if there are no records
         }
 
+        public List<double> GetExtremeHeartRates()
+        {
+            List<double> extremeHeartRates = new List<double>();
+
+            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
+            {
+                db.BeginTransaction();
+
+                string query =
+                    "WITH SmoothedData AS (" +
+                    "   SELECT id, " +
+                    "          heart_rate, " +
+                    "          AVG(heart_rate) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS smoothed_heart_rate " +
+                    "   FROM DaneSensorowe" +
+                    ")" +
+                    "SELECT sd.smoothed_heart_rate " +
+                    "FROM SmoothedData AS sd " +
+                    "WHERE " +
+                    "    (sd.id = (SELECT MIN(id) FROM SmoothedData)) OR " +
+                    "    (sd.id = (SELECT MAX(id) FROM SmoothedData)) OR " +
+                    "    ((sd.smoothed_heart_rate >= (SELECT smoothed_heart_rate FROM SmoothedData WHERE id = sd.id - 1)) AND " +
+                    "     (sd.smoothed_heart_rate > (SELECT smoothed_heart_rate FROM SmoothedData WHERE id = sd.id + 1))) " +
+                    "    OR " +
+                    "    ((sd.smoothed_heart_rate <= (SELECT smoothed_heart_rate FROM SmoothedData WHERE id = sd.id - 1)) AND " +
+                    "     (sd.smoothed_heart_rate < (SELECT smoothed_heart_rate FROM SmoothedData WHERE id = sd.id + 1))) " +
+                    "ORDER BY sd.id";
+
+                using (var cursor = db.RawQuery(query, null))
+                {
+                    while (cursor.MoveToNext())
+                    {
+                        extremeHeartRates.Add(cursor.GetDouble(cursor.GetColumnIndex("smoothed_heart_rate")));
+                    }
+                }
+
+                db.SetTransactionSuccessful();
+                db.EndTransaction();
+            }
+
+            return extremeHeartRates;
+        }
+
+
+
+
+
     }
 
 }

@@ -22,6 +22,7 @@ namespace SenMonitorowanie
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             View view = inflater.Inflate(Resource.Layout.fragment_my, container, false);
+            ViewHelper.SetFontForAllViews(view, Activity);
 
             // Znajdź TimePicker w widoku fragmentu
             timePicker = view.FindViewById<TimePicker>(Resource.Id.timePicker1);
