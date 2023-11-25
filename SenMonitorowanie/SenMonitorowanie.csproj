@@ -69,9 +69,11 @@
     <Compile Include="Strony\Page5Fragment.cs" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidAsset Include="Assets\fonts\font_regular.ttf" />
     <AndroidAsset Include="Assets\fonts\Anonymous_Pro.ttf" />
     <AndroidAsset Include="Assets\fonts\RobotoCondensed-Regular.ttf" />
+    <AndroidAsset Include="Assets\fonts\Mulish-ExtraBold.ttf" />
+    <AndroidAsset Include="Assets\fonts\AlegreyaSans-ExtraBold.ttf" />
+    <AndroidAsset Include="Assets\fonts\zai_ConsulPolishTypewriter.ttf" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
     <None Include="Properties\AndroidManifest.xml" />

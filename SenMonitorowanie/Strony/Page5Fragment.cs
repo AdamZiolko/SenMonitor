@@ -39,10 +39,10 @@ namespace SenMonitorowanie
             };
 
             czcionka.Click += (sender, e) => {
-                string[] tablicaCzcionek = { "fonts/font_regular.ttf", "fonts/Anonymous_Pro.ttf", "fonts/RobotoCondensed-Regular.ttf" };
+                string[] tablicaCzcionek = { "fonts/AlegreyaSans-ExtraBold.ttf", "fonts/Anonymous_Pro.ttf", "fonts/RobotoCondensed-Regular.ttf", "fonts/Mulish-ExtraBold.ttf", "fonts/zai_ConsulPolishTypewriter.ttf" };
                 ++kolejnaCzcionka;
-                Console.WriteLine(kolejnaCzcionka % 3);
-                AppSettings.CurrentFontPath = tablicaCzcionek[kolejnaCzcionka%3];
+                Console.WriteLine(kolejnaCzcionka % 5);
+                AppSettings.CurrentFontPath = tablicaCzcionek[kolejnaCzcionka%5];
                 ViewHelper.SetFontForAllViews(view, Activity);
 
                 //Toast.MakeText(Context, "Czcionka została zmieniona.", ToastLength.Short).Show();
