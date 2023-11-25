@@ -269,9 +269,9 @@ namespace SenMonitorowanie
             return 0; // Return 0 if there are no records
         }
 
-        public List<double> GetExtremeHeartRates()
+        public List<Tuple<DateTime, double>> GetExtremeHeartRatesWithDate()
         {
-            List<double> extremeHeartRates = new List<double>();
+            List<Tuple<DateTime, double>> extremeHeartRates = new List<Tuple<DateTime, double>>();
 
             using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
             {
@@ -279,12 +279,12 @@ namespace SenMonitorowanie
 
                 string query =
                     "WITH SmoothedData AS (" +
-                    "   SELECT id, " +
+                    "   SELECT date_time,id, " +
                     "          heart_rate, " +
                     "          AVG(heart_rate) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS smoothed_heart_rate " +
                     "   FROM DaneSensorowe" +
                     ")" +
-                    "SELECT sd.smoothed_heart_rate " +
+                    "SELECT sd.date_time, sd.smoothed_heart_rate, sd.id " +
                     "FROM SmoothedData AS sd " +
                     "WHERE " +
                     "    (sd.id = (SELECT MIN(id) FROM SmoothedData)) OR " +
@@ -300,7 +300,9 @@ namespace SenMonitorowanie
                 {
                     while (cursor.MoveToNext())
                     {
-                        extremeHeartRates.Add(cursor.GetDouble(cursor.GetColumnIndex("smoothed_heart_rate")));
+                        DateTime dateTime = DateTime.Parse(cursor.GetString(cursor.GetColumnIndex("date_time")));
+                        double smoothedHeartRate = cursor.GetDouble(cursor.GetColumnIndex("smoothed_heart_rate"));
+                        extremeHeartRates.Add(new Tuple<DateTime, double>(dateTime, smoothedHeartRate));
                     }
                 }
 
@@ -310,6 +312,24 @@ namespace SenMonitorowanie
 
             return extremeHeartRates;
         }
+
+        public double GetModeHeartRate()
+        {
+            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
+            {
+                string query = "SELECT heart_rate, COUNT(heart_rate) as count FROM DaneSensorowe GROUP BY heart_rate ORDER BY count DESC LIMIT 1";
+                using (var cursor = db.RawQuery(query, null))
+                {
+                    if (cursor.MoveToFirst())
+                    {
+                        double modeHeartRate = cursor.GetDouble(cursor.GetColumnIndex("heart_rate"));
+                        return Math.Round(modeHeartRate);
+                    }
+                }
+            }
+            return 0; // Return 0 if there are no records
+        }
+
 
 
 

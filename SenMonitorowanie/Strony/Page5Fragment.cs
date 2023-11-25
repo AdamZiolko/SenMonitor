@@ -30,7 +30,7 @@ namespace SenMonitorowanie
             // Znajdź przycisk w fragmencie
             Button ustawienia = view.FindViewById<Button>(Resource.Id.Ustawione);
             Button czcionka = view.FindViewById<Button>(Resource.Id.toggleFontButton);
-            int kolejnaCzcionka = 0;
+            int kolejnaCzcionka = 0;// za kazdym razem od zera się włącza?????
 
             // Dodaj akcję do przycisku
             ustawienia.Click += (sender, e) => {

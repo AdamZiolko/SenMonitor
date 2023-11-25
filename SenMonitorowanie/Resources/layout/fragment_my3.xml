@@ -12,38 +12,54 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-         <LinearLayout
-    android:layout_marginTop="20dp"
-    android:id="@+id/firstLinearLayout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_below="@+id/logoImageView"
-    android:layout_centerHorizontal="true"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:background="#259ba5">
+        <LinearLayout
+            android:layout_marginTop="20dp"
+            android:id="@+id/firstLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/logoImageView"
+            android:layout_centerHorizontal="true"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#259ba5">
 
             <TextView
                 android:id="@+id/TekstUstawienia"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="15dp"
+                android:textSize="18dp"
                 android:textStyle="bold"
                 android:layout_centerHorizontal="true"
                 android:textColor="#FFFFFF"
                 android:text="Raporty" />
 
+            <TextView
+                android:id="@+id/OstatniSen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13dp"
+                android:textStyle="bold"
+                android:layout_centerHorizontal="true"
+                android:textColor="#FFFFFF"
+                android:text="Najnowszy wykres pracy serca" />
+
+            <!-- Dodany ChartView -->
+            <Microcharts.Droid.ChartView
+                android:id="@+id/chartView"
+                android:layout_width="190dp"
+                android:layout_height="150dp"
+                android:layout_marginTop="10dp" />
 
             <!-- Dodany ListView -->
             <ListView
                 android:id="@+id/wypisDanych"
                 android:layout_width="match_parent"
                 android:layout_height="800dp"
-                android:layout_below="@+id/Statystyki2"
+                android:layout_below="@+id/chartView"
                 android:textColor="#FFFFFF"
                 android:layout_marginTop="10dp" />
         </LinearLayout>
 
-       
     </RelativeLayout>
+
 </ScrollView>

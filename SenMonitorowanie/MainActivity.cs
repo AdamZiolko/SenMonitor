@@ -115,6 +115,8 @@ namespace SenMonitorowanie
 
         public void StartSleepMonitoring()
         {
+            _databaseManager.ClearAllDaneSensoroweData();
+
             var serviceIntent = new Intent(this, typeof(MyBackgroundService));
             StartService(serviceIntent);
             // Start listening to sensors
@@ -150,23 +152,27 @@ namespace SenMonitorowanie
 
                 Console.WriteLine($"MAX heartate: {_databaseManager.GetMaxHeartRate()} MIN heartate: {_databaseManager.GetMinHeartRate()} AVG heartate: {_databaseManager.GetAverageHeartRate()}");
 
-                List<double> extremeHeartRates = _databaseManager.GetExtremeHeartRates();
+                List<Tuple<System.DateTime, double>> extremeHeartRates = _databaseManager.GetExtremeHeartRatesWithDate();
 
-                for (int i = 0; i < extremeHeartRates.Count; i++)
+                foreach (var data in extremeHeartRates)
                 {
-                    double heartRate = extremeHeartRates[i];
-                    Console.WriteLine($"Element {i + 1}: Heart Rate: {heartRate}");
+                    System.DateTime id = data.Item1;
+                    double smoothedHeartRate = data.Item2;
+                    Console.WriteLine($"data wystąpienia to: {data.Item1}, a dane serca to {smoothedHeartRate}");
+ 
                 }
 
-                // Stop listening to sensors
+
+
+                double modeHeartRate = _databaseManager.GetModeHeartRate();
+                Console.WriteLine(modeHeartRate);
+
                 _accelerometerHandler.StopListening();
-                //_audioRecorder.StopRecording();
                 _heartRateSensorHandler.StopListening();
                 _gyroscopeSensorHandler.StopListening();
 
                 var serviceIntent = new Intent(this, typeof(MyBackgroundService));
                 StopService(serviceIntent);
-                _databaseManager.ClearAllDaneSensoroweData();
             }
         }
 
@@ -226,6 +232,7 @@ namespace SenMonitorowanie
                 { // Ładuj niestandardowy widok z menu XML
                     View popupView = LayoutInflater.Inflate(Resource.Layout.custom_menu_item, null);
                     PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
+                    ViewHelper.SetFontForAllViews(popupView, this);
 
 
                     int[] location = new int[2];
