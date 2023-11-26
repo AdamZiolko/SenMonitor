@@ -6,7 +6,7 @@
     android:id="@+id/container3"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#259ba5">
+    android:background="#FF1493">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -21,7 +21,7 @@
             android:layout_centerHorizontal="true"
             android:orientation="vertical"
             android:gravity="center"
-            android:background="#259ba5">
+            android:background="#FF1493">
 
             <TextView
                 android:id="@+id/TekstUstawienia"
@@ -42,6 +42,17 @@
                 android:layout_centerHorizontal="true"
                 android:textColor="#FFFFFF"
                 android:text="Najnowszy wykres pracy serca" />
+            
+        <LinearLayout
+            android:layout_marginTop="20dp"
+            android:id="@+id/firstLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_below="@+id/logoImageView"
+            android:layout_centerHorizontal="true"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF">
 
             <!-- Dodany ChartView -->
             <Microcharts.Droid.ChartView
@@ -49,6 +60,10 @@
                 android:layout_width="190dp"
                 android:layout_height="150dp"
                 android:layout_marginTop="10dp" />
+
+        </LinearLayout>
+
+
 
             <!-- Dodany ListView -->
             <ListView

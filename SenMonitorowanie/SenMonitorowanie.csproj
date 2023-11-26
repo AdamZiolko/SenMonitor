@@ -55,6 +55,8 @@
   <ItemGroup>
     <Compile Include="Database\DatabaseHelper.cs" />
     <Compile Include="Database\DatabaseManager.cs" />
+    <Compile Include="FontManager.cs" />
+    <Compile Include="UslugaTla.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

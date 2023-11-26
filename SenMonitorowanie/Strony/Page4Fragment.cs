@@ -62,7 +62,7 @@ namespace SenMonitorowanie
 
 
             // Obliczanie czasu względnego dla każdego elementu w liście
-            extremeHeartRates = extremeHeartRates.Select(t => new Tuple<DateTime, double>(poczatekCzasuUnixowego.AddSeconds((t.Item1.Ticks / TimeSpan.TicksPerSecond) - poczatekSekundy ), t.Item2)).ToList();
+            extremeHeartRates = extremeHeartRates.Select(t => new Tuple<DateTime, double>(poczatekCzasuUnixowego.AddSeconds((t.Item1.Ticks / TimeSpan.TicksPerSecond) - poczatekSekundy), t.Item2)).ToList();
 
             // Display chart
             DisplayChart(chartView, extremeHeartRates);
@@ -94,7 +94,7 @@ namespace SenMonitorowanie
                 Console.WriteLine("Czas Zakończenia: " + dane.CzasZakonczenia);
 
                 string formattedData = $"Data: {dane.Data.Substring(5, dane.Data.Length - 8)} \nCzas trwania: {koncowyCzasTrwania}h \nOcena: {dane.Ocena}" +
-                    $"\nŚrednie tetno: 45 \nMax tetno: 324 15:47\nMin tetno: -34 \nWzrostow tetna: 18\nO godzinach: \nDane\nSpadkow tetna: 7\n";
+                    $"\nŚrednie tetno: 45 \nMax tetno: 324 15:47\nMin tetno: -34 \nZnacznych zmian tenta: 32 \nIlość ruchów: 321";
                 adapter.Add(formattedData);
             }
 
@@ -105,8 +105,8 @@ namespace SenMonitorowanie
         private void DisplayChart(ChartView chartView, List<Tuple<DateTime, double>> data)
         {
             var entries = new List<ChartEntry>();
+            int labelInterval = data.Count < 8 ? 7 : data.Count / 8; // Wybierz co ile punktów wyświetlić etykietę
 
-            int labelInterval = data.Count / 8; // Wybierz co ile punktów wyświetlić etykietę
 
             for (int i = 0; i < data.Count; i++)
             {
@@ -115,16 +115,18 @@ namespace SenMonitorowanie
 
                 entries.Add(new ChartEntry(intValue)
                 {
-                    Label = i % labelInterval == 0 ? tuple.Item1.ToString().Substring(9, tuple.Item1.ToString().Length - 15) : string.Empty,
+                    Label = i % labelInterval == 0 ? tuple.Item1.ToString("HH:mm") : string.Empty,
                     ValueLabel = i % labelInterval == 0 ? intValue.ToString() : string.Empty,
                     Color = SKColor.Parse("#FF1493"),
-                });
+                }); 
+
             }
 
             var chart = new LineChart { Entries = entries };
             //chart.LabelOrientation = Microcharts.Orientation.Horizontal;
 
             chartView.Chart = chart;
+
         }
 
 

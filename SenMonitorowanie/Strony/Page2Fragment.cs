@@ -10,8 +10,8 @@ namespace SenMonitorowanie
     {
         private TimePicker timePicker;
         private TimePicker timePicker2;
-        private int selectedHour = 6;
-        private int selectedMinute = 16;
+        private int selectedHour = 0;
+        private int selectedMinute = 0;
         private DatabaseManager _databaseManager;
 
         public Page2Fragment(DatabaseManager databaseManager)

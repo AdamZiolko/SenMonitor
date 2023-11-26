@@ -34,6 +34,8 @@ namespace SenMonitorowanie
         private GyroscopeSensorHandler _gyroscopeSensorHandler;
         System.Timers.Timer timer;
 
+        private DateTime startTime;
+        DateTime startDate = DateTime.Today;
 
         public bool IsMonitoring = false;
         //private Button mainMonitoringButton;
@@ -124,6 +126,7 @@ namespace SenMonitorowanie
             //_audioRecorder.StartRecording();
             _heartRateSensorHandler.StartListening();
             _gyroscopeSensorHandler.StartListening();
+            startTime = DateTime.Now;
 
 
             if (isTimerRunning && timer != null)
@@ -150,22 +153,41 @@ namespace SenMonitorowanie
                 timer.Dispose();
                 isTimerRunning = false;
 
+
+
+                string currentDateAsString = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                TimeSpan duration = DateTime.Now - startTime;
+                int seconds = (int)duration.TotalSeconds;
+                int ocenkaSnu = 5;
+                int startTimeInSeconds = (int)(startTime - startDate).TotalSeconds;
+                int currentTimeInSeconds = (int)(DateTime.Now - startDate).TotalSeconds;
+
+
                 Console.WriteLine($"MAX heartate: {_databaseManager.GetMaxHeartRate()} MIN heartate: {_databaseManager.GetMinHeartRate()} AVG heartate: {_databaseManager.GetAverageHeartRate()}");
 
-                List<Tuple<System.DateTime, double>> extremeHeartRates = _databaseManager.GetExtremeHeartRatesWithDate();
+                Dictionary<DateTime, int> extremeSensorDataCount = _databaseManager.GetExtremeSensorDataCountPerHour();
+                int iloscRuchow = 0;
 
-                foreach (var data in extremeHeartRates)
+                foreach (var entry in extremeSensorDataCount)
                 {
-                    System.DateTime id = data.Item1;
-                    double smoothedHeartRate = data.Item2;
-                    Console.WriteLine($"data wystąpienia to: {data.Item1}, a dane serca to {smoothedHeartRate}");
- 
+                    Console.WriteLine($"Hour: {entry.Key}, Count: {entry.Value}"); /// dzielić przez 2 ilośc ruchów?????????
+                    iloscRuchow += entry.Value;    // ilość wszystkich ruchów
                 }
 
+                _databaseManager.InsertDaneSnow(currentDateAsString, seconds, ocenkaSnu, startTimeInSeconds, currentTimeInSeconds, (float)_databaseManager.GetAverageHeartRate(), (float)_databaseManager.GetMinHeartRate(), (float)_databaseManager.GetMaxHeartRate(), iloscRuchow);
+                // List<Tuple<System.DateTime, double>> extremeHeartRates = _databaseManager.GetExtremeHeartRatesWithDate();
+                // _databaseManager.SaveExtremeHeartRatesToDatabase(extremeHeartRates);
+                /*
+                 foreach (var data in extremeHeartRates)
+                 {
+                     System.DateTime id = data.Item1;
+                     double smoothedHeartRate = data.Item2;
+                     Console.WriteLine($"data wystąpienia to: {data.Item1}, a dane serca to {smoothedHeartRate}");
+
+                 }*/
 
 
-                double modeHeartRate = _databaseManager.GetModeHeartRate();
-                Console.WriteLine(modeHeartRate);
+
 
                 _accelerometerHandler.StopListening();
                 _heartRateSensorHandler.StopListening();
@@ -307,93 +329,6 @@ namespace SenMonitorowanie
 
         }
     }
-
-
-
-    [Service]
-    public class MyBackgroundService : Service
-    {
-        private const int ServiceNotificationId = 1; // Unikalne ID powiadomienia dla Foreground Service
-
-        public override IBinder OnBind(Intent intent)
-        {
-            return null;
-        }
-
-        public override StartCommandResult OnStartCommand(Intent intent, StartCommandFlags flags, int startId)
-        {
-            // Umieść kod, który ma być wykonywany w tle
-
-            // Rozpocznij usługę w pierwszym planie
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
-            {
-                StartForegroundOreo();
-            }
-            else
-            {
-                StartForeground(ServiceNotificationId, CreateNotification("Foreground Service", "Service is running"));
-            }
-
-            // Zwróć jeden z kodów wyniku StartCommandResult, na przykład:
-            return StartCommandResult.Sticky;
-        }
-
-        private void StartForegroundOreo()
-        {
-            // Ustawienie kanału powiadomień dla Androida 8.0 i nowszych
-            NotificationChannel channel = new NotificationChannel("channel_id", "Channel Name", NotificationImportance.Default);
-            NotificationManager notificationManager = (NotificationManager)GetSystemService(NotificationService);
-            notificationManager.CreateNotificationChannel(channel);
-
-            // Utworzenie powiadomienia dla Foreground Service
-            Notification notification = new Notification.Builder(this, "channel_id")
-                .SetContentTitle("Foreground Service")
-                .SetContentText("Service is running")
-                .SetSmallIcon(Resource.Drawable.icon) // Zastąp "my_icon" odpowiednią nazwą swojego pliku graficznego
-                .Build();
-
-            // Rozpocznij usługę w pierwszym planie
-            StartForeground(ServiceNotificationId, notification);
-        }
-
-        public override void OnDestroy()
-        {
-            // Zatrzymaj usługę w pierwszym planie, gdy usługa jest zatrzymywana
-            StopForeground(true);
-
-            base.OnDestroy();
-        }
-
-
-        private Notification CreateNotification(string title, string content)
-        {
-            // Utwórz powiadomienie dla Foreground Service
-            Notification.Builder builder;
-
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
-            {
-                builder = new Notification.Builder(this, "channel_id");
-            }
-            else
-            {
-                builder = new Notification.Builder(this);
-            }
-
-            builder.SetContentTitle(title)
-                   .SetContentText(content)
-                   .SetSmallIcon(Resource.Drawable.icon) // Zastąp "my_icon" odpowiednią nazwą swojego pliku graficznego
-                   .Build();
-
-            return builder.Build();
-        }
-
-        // Reszta kodu
-    }
-
-
-
-
-
 }
 
 

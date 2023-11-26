@@ -63,6 +63,40 @@ namespace SenMonitorowanie
             }
         }
 
+        public void InsertDaneSnow(string data, int czasTrwania, int ocena, int czasPoczatku, int czasZakonczenia, float avgHeartRate, float maxHeartRate, float minHeartRate, int moveCount)
+        {
+            using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
+            {
+                db.BeginTransaction();
+                try
+                {
+                    ContentValues values = new ContentValues();
+                    values.Put("Data", data);
+                    values.Put("CzasTrwania", czasTrwania);
+                    values.Put("Ocena", ocena);
+                    values.Put("CzasPoczatku", czasPoczatku);
+                    values.Put("CzasZakonczenia", czasZakonczenia);
+                    values.Put("avg_heart_rate", avgHeartRate);
+                    values.Put("max_hear_rate", maxHeartRate); // Corrected column name
+                    values.Put("min_heart_rate", minHeartRate);
+                    values.Put("move_count", moveCount);
+
+                    db.InsertOrThrow("BazaSnow", null, values);
+
+                    db.SetTransactionSuccessful();
+                }
+                catch (Exception ex)
+                {
+                    // Handle exceptions if needed
+                }
+                finally
+                {
+                    db.EndTransaction();
+                }
+            }
+        }
+
+
         public void InsertDaneSensorowe(string dateTime, float accX, float accY, float accZ, float gyrX, float gyrY, float gyrZ, float heartRate)
         {
             using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
@@ -330,11 +364,97 @@ namespace SenMonitorowanie
             return 0; // Return 0 if there are no records
         }
 
+        public Dictionary<DateTime, int> GetExtremeSensorDataCountPerHour()
+        {
+            Dictionary<DateTime, int> extremeSensorDataCount = new Dictionary<DateTime, int>();
 
+            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
+            {
+                db.BeginTransaction();
 
+                string query =
+                            "WITH SmoothedSensorData AS (" +
+                    "    SELECT " +
+                    "        date_time, " +
+                    "        id, " +
+                    "        acc_x, " +
+                    "        AVG(acc_x) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS smoothed_acc_x, " +
+                    "        acc_y, " +
+                    "        AVG(acc_y) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS smoothed_acc_y, " +
+                    "        acc_z, " +
+                    "        AVG(acc_z) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS smoothed_acc_z, " +
+                    "        gyr_x, " +
+                    "        AVG(gyr_x) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS smoothed_gyr_x, " +
+                    "        gyr_y, " +
+                    "        AVG(gyr_y) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS smoothed_gyr_y, " +
+                    "        gyr_z, " +
+                    "        AVG(gyr_z) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS smoothed_gyr_z " +
+                    "    FROM DaneSensorowe " +
+                    ") " +
+                    "SELECT " +
+                    "    ssd.date_time, " +
+                    "    ssd.id " +
+                    "FROM SmoothedSensorData AS ssd " +
+                    "WHERE " +
+                    "    ( " +
+                    "        ((ssd.smoothed_acc_x >= (SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
+                    "         (ssd.smoothed_acc_x > (SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
+                    "        ((ssd.smoothed_acc_y >= (SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
+                    "         (ssd.smoothed_acc_y > (SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
+                    "        ((ssd.smoothed_acc_z >= (SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
+                    "         (ssd.smoothed_acc_z > (SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
+                    "        ((ssd.smoothed_gyr_x >= (SELECT smoothed_gyr_x FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
+                    "         (ssd.smoothed_gyr_x > (SELECT smoothed_gyr_x FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
+                    "        ((ssd.smoothed_gyr_y >= (SELECT smoothed_gyr_y FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
+                    "         (ssd.smoothed_gyr_y > (SELECT smoothed_gyr_y FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
+                    "        ((ssd.smoothed_gyr_z >= (SELECT smoothed_gyr_z FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
+                    "         (ssd.smoothed_gyr_z > (SELECT smoothed_gyr_z FROM SmoothedSensorData WHERE id = ssd.id + 1))) " +
+                    "    ) OR " +
+                    "    ( " +
+                    "        ((ssd.smoothed_acc_x <= (SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
+                    "         (ssd.smoothed_acc_x < (SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
+                    "        ((ssd.smoothed_acc_y <= (SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
+                    "         (ssd.smoothed_acc_y < (SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
+                    "        ((ssd.smoothed_acc_z <= (SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
+                    "         (ssd.smoothed_acc_z < (SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
+                    "        ((ssd.smoothed_gyr_x <= (SELECT smoothed_gyr_x FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
+                    "         (ssd.smoothed_gyr_x < (SELECT smoothed_gyr_x FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
+                    "        ((ssd.smoothed_gyr_y <= (SELECT smoothed_gyr_y FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
+                    "         (ssd.smoothed_gyr_y < (SELECT smoothed_gyr_y FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
+                    "        ((ssd.smoothed_gyr_z <= (SELECT smoothed_gyr_z FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
+                    "         (ssd.smoothed_gyr_z < (SELECT smoothed_gyr_z FROM SmoothedSensorData WHERE id = ssd.id + 1)) " +
+                    "    )) " +
+                    "ORDER BY ssd.id";
 
+                using (var cursor = db.RawQuery(query, null))
+                {
+                    while (cursor.MoveToNext())
+                    {
+                        DateTime dateTime = DateTime.Parse(cursor.GetString(cursor.GetColumnIndex("date_time")));
+                        int id = cursor.GetInt(cursor.GetColumnIndex("id"));
 
+                        // Extract the hour part from the DateTime
+                        DateTime hourDateTime = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, 0, 0);
 
+                        // Check if the hour is already in the dictionary, if not, add it with a count of 1
+                        if (!extremeSensorDataCount.ContainsKey(hourDateTime))
+                        {
+                            extremeSensorDataCount[hourDateTime] = 1;
+                        }
+                        else
+                        {
+                            // Increment the count for the existing hour
+                            extremeSensorDataCount[hourDateTime]++;
+                        }
+                    }
+                }
+
+                db.SetTransactionSuccessful();
+                db.EndTransaction();
+            }
+
+            return extremeSensorDataCount;
+        }
     }
 
-}
+    }
