@@ -94,7 +94,7 @@ namespace SenMonitorowanie
                 Console.WriteLine("Czas Zakończenia: " + dane.CzasZakonczenia);
 
                 string formattedData = $"Data: {dane.Data.Substring(5, dane.Data.Length - 8)} \nCzas trwania: {koncowyCzasTrwania}h \nOcena: {dane.Ocena}" +
-                    $"\nŚrednie tetno: 45 \nMax tetno: 324 15:47\nMin tetno: -34 \nZnacznych zmian tenta: 32 \nIlość ruchów: 321";
+                    $"\nŚrednie tętno: 45 \nMax tętno: 324 15:47\nMin tętno: -34 \nZnacznych zmian tętna: 32 \nIlość ruchów: 321";
                 adapter.Add(formattedData);
             }
 
