@@ -32,6 +32,9 @@ namespace SenMonitorowanie
         //private AudioRecorder _audioRecorder;
         private HeartRateSensorHandler _heartRateSensorHandler; // Dodanie obsługi czujnika tętna
         private GyroscopeSensorHandler _gyroscopeSensorHandler;
+        private AmbientTemperatureSensorHandler _ambient;
+        private LightSensorHandler _light;
+
         System.Timers.Timer timer;
 
         private DateTime startTime;
@@ -58,7 +61,8 @@ namespace SenMonitorowanie
            //_audioRecorder = new AudioRecorder(_volumeLevelTextView);
           _heartRateSensorHandler = new HeartRateSensorHandler(_sensorManager, _databaseManager); // Inicjalizacja obsługi czujnika tętna
          _gyroscopeSensorHandler = new GyroscopeSensorHandler(_sensorManager, _databaseManager);
-
+            _ambient = new AmbientTemperatureSensorHandler(_sensorManager);
+            _light = new LightSensorHandler(_sensorManager);
             SetAmbientEnabled();
 
             FragmentManager fragmentManager = FragmentManager;
@@ -93,7 +97,8 @@ namespace SenMonitorowanie
             List<float> accelerometerData = _accelerometerHandler.GetAccelerometerData();
             float heartRateData = _heartRateSensorHandler.getActualData();
             List<float> gyroscopeData = _gyroscopeSensorHandler.GetGyroscopeData();
-
+            float temperatura = _ambient.GetAmbientTemperatureData();
+            float swiatelko = _light.GetLightSensorData();
 
             DateTime currentDate = DateTime.Now;
             string collectionTime = currentDate.ToString("yyyy-MM-dd H:mm:ss");
@@ -103,7 +108,8 @@ namespace SenMonitorowanie
             //{
             lock (databaseLock){
                 Console.WriteLine($"Data pobrania : {collectionTime} AX: {accelerometerData[0]}, AY: {accelerometerData[1]}, AZ: {accelerometerData[2]}, heart: {heartRateData}, Gx: {gyroscopeData[0]}, Gy: {gyroscopeData[1]}, Gz: {gyroscopeData[2]},");
-                _databaseManager.InsertDaneSensorowe(collectionTime, accelerometerData[0], accelerometerData[1], accelerometerData[2], gyroscopeData[0], gyroscopeData[1], gyroscopeData[2], heartRateData);
+                Console.WriteLine($"Poziom temperatury: {temperatura} Poziom światła: {swiatelko}");
+                _databaseManager.InsertDaneSensorowe(collectionTime, accelerometerData[0], accelerometerData[1], accelerometerData[2], gyroscopeData[0], gyroscopeData[1], gyroscopeData[2], heartRateData, temperatura, swiatelko);
             }
             //_databaseManager.InsertDaneSensorowe();
             //}
@@ -126,6 +132,8 @@ namespace SenMonitorowanie
             //_audioRecorder.StartRecording();
             _heartRateSensorHandler.StartListening();
             _gyroscopeSensorHandler.StartListening();
+            _ambient.StartListening();
+            _light.StartListening();
             startTime = DateTime.Now;
 
 
@@ -163,8 +171,9 @@ namespace SenMonitorowanie
                 int currentTimeInSeconds = (int)(DateTime.Now - startDate).TotalSeconds;
 
 
-                Console.WriteLine($"MAX heartate: {_databaseManager.GetMaxHeartRate()} MIN heartate: {_databaseManager.GetMinHeartRate()} AVG heartate: {_databaseManager.GetAverageHeartRate()}");
-
+                Console.WriteLine($"MAX heartate: {_databaseManager.GetMax("heart_rate")} MIN heartate: {_databaseManager.GetMin("heart_rate")} AVG heartate: {_databaseManager.GetAverage("heart_rate")}");
+                Console.WriteLine($"MAX temperature : {_databaseManager.GetMax("temperature ")} MIN temperature : {_databaseManager.GetMin("temperature ")} AVG temperature : {_databaseManager.GetAverage("temperature ")}");
+                Console.WriteLine($"AVG light : {_databaseManager.GetAverage("light")}");
                 Dictionary<DateTime, int> extremeSensorDataCount = _databaseManager.GetExtremeSensorDataCountPerHour();
                 int iloscRuchow = 0;
 
@@ -174,7 +183,11 @@ namespace SenMonitorowanie
                     iloscRuchow += entry.Value;    // ilość wszystkich ruchów
                 }
 
-                _databaseManager.InsertDaneSnow(currentDateAsString, seconds, ocenkaSnu, startTimeInSeconds, currentTimeInSeconds, (float)_databaseManager.GetAverageHeartRate(), (float)_databaseManager.GetMinHeartRate(), (float)_databaseManager.GetMaxHeartRate(), iloscRuchow);
+                _databaseManager.InsertDaneSnow(currentDateAsString, seconds, ocenkaSnu, startTimeInSeconds, currentTimeInSeconds,
+                    (float)_databaseManager.GetAverage("heart_rate"), (float)_databaseManager.GetMin("heart_rate"),
+                    (float)_databaseManager.GetMax("heart_rate"), iloscRuchow, (float)_databaseManager.GetMin("temperature "),
+                    (float)_databaseManager.GetMax("temperature "), (float)_databaseManager.GetAverage("temperature"), (float)_databaseManager.GetAverage("light")
+                );
                 // List<Tuple<System.DateTime, double>> extremeHeartRates = _databaseManager.GetExtremeHeartRatesWithDate();
                 // _databaseManager.SaveExtremeHeartRatesToDatabase(extremeHeartRates);
                 /*
@@ -192,6 +205,8 @@ namespace SenMonitorowanie
                 _accelerometerHandler.StopListening();
                 _heartRateSensorHandler.StopListening();
                 _gyroscopeSensorHandler.StopListening();
+                _ambient.StopListening();
+                _light.StopListening();
 
                 var serviceIntent = new Intent(this, typeof(MyBackgroundService));
                 StopService(serviceIntent);

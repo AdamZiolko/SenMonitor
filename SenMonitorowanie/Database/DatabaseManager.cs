@@ -63,7 +63,9 @@ namespace SenMonitorowanie
             }
         }
 
-        public void InsertDaneSnow(string data, int czasTrwania, int ocena, int czasPoczatku, int czasZakonczenia, float avgHeartRate, float maxHeartRate, float minHeartRate, int moveCount)
+        public void InsertDaneSnow(string data, int czasTrwania, int ocena, int czasPoczatku, int czasZakonczenia,
+                                    float avgHeartRate, float maxHeartRate, float minHeartRate, int moveCount,
+                                    float minTemp, float maxTemp, float avgTemp, float avgLight)
         {
             using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
             {
@@ -77,9 +79,13 @@ namespace SenMonitorowanie
                     values.Put("CzasPoczatku", czasPoczatku);
                     values.Put("CzasZakonczenia", czasZakonczenia);
                     values.Put("avg_heart_rate", avgHeartRate);
-                    values.Put("max_hear_rate", maxHeartRate); // Corrected column name
+                    values.Put("max_hear_rate", maxHeartRate);
                     values.Put("min_heart_rate", minHeartRate);
                     values.Put("move_count", moveCount);
+                    values.Put("min_temp", minTemp);
+                    values.Put("max_temp", maxTemp);
+                    values.Put("avg_temp", avgTemp);
+                    values.Put("avg_light", avgLight);
 
                     db.InsertOrThrow("BazaSnow", null, values);
 
@@ -97,7 +103,7 @@ namespace SenMonitorowanie
         }
 
 
-        public void InsertDaneSensorowe(string dateTime, float accX, float accY, float accZ, float gyrX, float gyrY, float gyrZ, float heartRate)
+        public void InsertDaneSensorowe(string dateTime, float accX, float accY, float accZ, float gyrX, float gyrY, float gyrZ, float heartRate, float temperature, float light)
         {
             using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
             {
@@ -111,6 +117,8 @@ namespace SenMonitorowanie
                 values.Put("gyr_y", gyrY);
                 values.Put("gyr_z", gyrZ);
                 values.Put("heart_rate", heartRate);
+                values.Put("temperature", temperature); // Add temperature column
+                values.Put("light", light); // Add light column
                 db.InsertOrThrow("DaneSensorowe", null, values);
                 db.SetTransactionSuccessful();
                 db.EndTransaction();
@@ -255,11 +263,11 @@ namespace SenMonitorowanie
             }
         }
 
-        public double GetMaxHeartRate()
+        public double GetMax(string zmienna)
         {
             using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
             {
-                string query = "SELECT MAX(heart_rate) FROM DaneSensorowe";
+                string query = $"SELECT MAX({zmienna}) FROM DaneSensorowe";
                 using (var cursor = db.RawQuery(query, null))
                 {
                     if (cursor.MoveToFirst())
@@ -271,11 +279,11 @@ namespace SenMonitorowanie
             return 0; // Return 0 if there are no records
         }
 
-        public double GetMinHeartRate()
+        public double GetMin(string zmienna)
         {
             using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
             {
-                string query = "SELECT MIN(heart_rate) FROM DaneSensorowe";
+                string query = $"SELECT MIN({zmienna}) FROM DaneSensorowe";
                 using (var cursor = db.RawQuery(query, null))
                 {
                     if (cursor.MoveToFirst())
@@ -287,11 +295,11 @@ namespace SenMonitorowanie
             return 0; // Return 0 if there are no records
         }
 
-        public double GetAverageHeartRate()
+        public double GetAverage(string zmienna)
         {
             using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
             {
-                string query = "SELECT AVG(heart_rate) FROM DaneSensorowe";
+                string query = $"SELECT AVG({zmienna}) FROM DaneSensorowe";
                 using (var cursor = db.RawQuery(query, null))
                 {
                     if (cursor.MoveToFirst())
@@ -347,23 +355,6 @@ namespace SenMonitorowanie
             return extremeHeartRates;
         }
 
-        public double GetModeHeartRate()
-        {
-            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
-            {
-                string query = "SELECT heart_rate, COUNT(heart_rate) as count FROM DaneSensorowe GROUP BY heart_rate ORDER BY count DESC LIMIT 1";
-                using (var cursor = db.RawQuery(query, null))
-                {
-                    if (cursor.MoveToFirst())
-                    {
-                        double modeHeartRate = cursor.GetDouble(cursor.GetColumnIndex("heart_rate"));
-                        return Math.Round(modeHeartRate);
-                    }
-                }
-            }
-            return 0; // Return 0 if there are no records
-        }
-
         public Dictionary<DateTime, int> GetExtremeSensorDataCountPerHour()
         {
             Dictionary<DateTime, int> extremeSensorDataCount = new Dictionary<DateTime, int>();
@@ -397,32 +388,32 @@ namespace SenMonitorowanie
                     "FROM SmoothedSensorData AS ssd " +
                     "WHERE " +
                     "    ( " +
-                    "        ((ssd.smoothed_acc_x >= (SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
-                    "         (ssd.smoothed_acc_x > (SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
-                    "        ((ssd.smoothed_acc_y >= (SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
-                    "         (ssd.smoothed_acc_y > (SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
-                    "        ((ssd.smoothed_acc_z >= (SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
-                    "         (ssd.smoothed_acc_z > (SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
-                    "        ((ssd.smoothed_gyr_x >= (SELECT smoothed_gyr_x FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
-                    "         (ssd.smoothed_gyr_x > (SELECT smoothed_gyr_x FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
-                    "        ((ssd.smoothed_gyr_y >= (SELECT smoothed_gyr_y FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
-                    "         (ssd.smoothed_gyr_y > (SELECT smoothed_gyr_y FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
-                    "        ((ssd.smoothed_gyr_z >= (SELECT smoothed_gyr_z FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
-                    "         (ssd.smoothed_gyr_z > (SELECT smoothed_gyr_z FROM SmoothedSensorData WHERE id = ssd.id + 1))) " +
+                    "        ((ssd.smoothed_acc_x >= ((SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id - 1)) + 2 ) AND " +
+                    "         (ssd.smoothed_acc_x > ((SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id + 1))) + 2 ) OR " +
+                    "        ((ssd.smoothed_acc_y >= ((SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id - 1)) + 2 ) AND " +
+                    "         (ssd.smoothed_acc_y > ((SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id + 1))) + 2 ) OR " +
+                    "        ((ssd.smoothed_acc_z >= ((SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id - 1)) + 2 ) AND " +
+                    "         (ssd.smoothed_acc_z > ((SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id + 1))) + 2 ) OR " +
+                    "        ((ssd.smoothed_gyr_x >= ((SELECT smoothed_gyr_x FROM SmoothedSensorData WHERE id = ssd.id - 1)) + 2 ) AND " +
+                    "         (ssd.smoothed_gyr_x > ((SELECT smoothed_gyr_x FROM SmoothedSensorData WHERE id = ssd.id + 1))) + 2 ) OR " +
+                    "        ((ssd.smoothed_gyr_y >= ((SELECT smoothed_gyr_y FROM SmoothedSensorData WHERE id = ssd.id - 1)) + 2 ) AND " +
+                    "         (ssd.smoothed_gyr_y > ((SELECT smoothed_gyr_y FROM SmoothedSensorData WHERE id = ssd.id + 1))) + 2 ) OR " +
+                    "        ((ssd.smoothed_gyr_z >= ((SELECT smoothed_gyr_z FROM SmoothedSensorData WHERE id = ssd.id - 1)) + 2 ) AND " +
+                    "         (ssd.smoothed_gyr_z > ((SELECT smoothed_gyr_z FROM SmoothedSensorData WHERE id = ssd.id + 1))) + 2 ) " +
                     "    ) OR " +
                     "    ( " +
-                    "        ((ssd.smoothed_acc_x <= (SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
-                    "         (ssd.smoothed_acc_x < (SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
-                    "        ((ssd.smoothed_acc_y <= (SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
-                    "         (ssd.smoothed_acc_y < (SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
-                    "        ((ssd.smoothed_acc_z <= (SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
-                    "         (ssd.smoothed_acc_z < (SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
-                    "        ((ssd.smoothed_gyr_x <= (SELECT smoothed_gyr_x FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
-                    "         (ssd.smoothed_gyr_x < (SELECT smoothed_gyr_x FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
-                    "        ((ssd.smoothed_gyr_y <= (SELECT smoothed_gyr_y FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
-                    "         (ssd.smoothed_gyr_y < (SELECT smoothed_gyr_y FROM SmoothedSensorData WHERE id = ssd.id + 1))) OR " +
-                    "        ((ssd.smoothed_gyr_z <= (SELECT smoothed_gyr_z FROM SmoothedSensorData WHERE id = ssd.id - 1)) AND " +
-                    "         (ssd.smoothed_gyr_z < (SELECT smoothed_gyr_z FROM SmoothedSensorData WHERE id = ssd.id + 1)) " +
+                    "        (((ssd.smoothed_acc_x <= (SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id - 1)) - 2) AND " +
+                    "         ((ssd.smoothed_acc_x < (SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id + 1))) - 2) OR " +
+                    "        (((ssd.smoothed_acc_y <= (SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id - 1)) - 2) AND " +
+                    "         ((ssd.smoothed_acc_y < (SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id + 1))) - 2) OR " +
+                    "        (((ssd.smoothed_acc_z <= (SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id - 1)) - 2) AND " +
+                    "         ((ssd.smoothed_acc_z < (SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id + 1))) - 2) OR " +
+                    "        (((ssd.smoothed_gyr_x <= (SELECT smoothed_gyr_x FROM SmoothedSensorData WHERE id = ssd.id - 1)) - 2) AND " +
+                    "         ((ssd.smoothed_gyr_x < (SELECT smoothed_gyr_x FROM SmoothedSensorData WHERE id = ssd.id + 1))) - 2) OR " +
+                    "        (((ssd.smoothed_gyr_y <= (SELECT smoothed_gyr_y FROM SmoothedSensorData WHERE id = ssd.id - 1)) - 2) AND " +
+                    "         ((ssd.smoothed_gyr_y < (SELECT smoothed_gyr_y FROM SmoothedSensorData WHERE id = ssd.id + 1))) - 2) OR " +
+                    "        (((ssd.smoothed_gyr_z <= (SELECT smoothed_gyr_z FROM SmoothedSensorData WHERE id = ssd.id - 1)) - 2) AND " +
+                    "         ((ssd.smoothed_gyr_z < (SELECT smoothed_gyr_z FROM SmoothedSensorData WHERE id = ssd.id + 1)) - 2) " +
                     "    )) " +
                     "ORDER BY ssd.id";
 
@@ -455,6 +446,8 @@ namespace SenMonitorowanie
 
             return extremeSensorDataCount;
         }
+
+
     }
 
     }
