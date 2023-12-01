@@ -31,7 +31,7 @@ namespace SenMonitorowanie
         private AccelerometerHandler _accelerometerHandler;
         //private AudioRecorder _audioRecorder;
         private HeartRateSensorHandler _heartRateSensorHandler; // Dodanie obsługi czujnika tętna
-        private GyroscopeSensorHandler _gyroscopeSensorHandler;
+       // private GyroscopeSensorHandler _gyroscopeSensorHandler;
         private AmbientTemperatureSensorHandler _ambient;
         private LightSensorHandler _light;
 
@@ -60,7 +60,7 @@ namespace SenMonitorowanie
           _accelerometerHandler = new AccelerometerHandler(_sensorManager, _databaseManager);
            //_audioRecorder = new AudioRecorder(_volumeLevelTextView);
           _heartRateSensorHandler = new HeartRateSensorHandler(_sensorManager, _databaseManager); // Inicjalizacja obsługi czujnika tętna
-         _gyroscopeSensorHandler = new GyroscopeSensorHandler(_sensorManager, _databaseManager);
+         //_gyroscopeSensorHandler = new GyroscopeSensorHandler(_sensorManager, _databaseManager);
             _ambient = new AmbientTemperatureSensorHandler(_sensorManager);
             _light = new LightSensorHandler(_sensorManager);
             SetAmbientEnabled();
@@ -96,7 +96,7 @@ namespace SenMonitorowanie
 
             List<float> accelerometerData = _accelerometerHandler.GetAccelerometerData();
             float heartRateData = _heartRateSensorHandler.getActualData();
-            List<float> gyroscopeData = _gyroscopeSensorHandler.GetGyroscopeData();
+            //List<float> gyroscopeData = _gyroscopeSensorHandler.GetGyroscopeData();
             float temperatura = _ambient.GetAmbientTemperatureData();
             float swiatelko = _light.GetLightSensorData();
 
@@ -107,9 +107,9 @@ namespace SenMonitorowanie
             //foreach (List<float> data in accelerometerData)
             //{
             lock (databaseLock){
-                Console.WriteLine($"Data pobrania : {collectionTime} AX: {accelerometerData[0]}, AY: {accelerometerData[1]}, AZ: {accelerometerData[2]}, heart: {heartRateData}, Gx: {gyroscopeData[0]}, Gy: {gyroscopeData[1]}, Gz: {gyroscopeData[2]},");
+                Console.WriteLine($"Data pobrania : {collectionTime} AX: {accelerometerData[0]}, AY: {accelerometerData[1]}, AZ: {accelerometerData[2]}, heart: {heartRateData}");
                 Console.WriteLine($"Poziom temperatury: {temperatura} Poziom światła: {swiatelko}");
-                _databaseManager.InsertDaneSensorowe(collectionTime, accelerometerData[0], accelerometerData[1], accelerometerData[2], gyroscopeData[0], gyroscopeData[1], gyroscopeData[2], heartRateData, temperatura, swiatelko);
+                _databaseManager.InsertDaneSensorowe(collectionTime, accelerometerData[0], accelerometerData[1], accelerometerData[2], heartRateData, temperatura, swiatelko);
             }
             //_databaseManager.InsertDaneSensorowe();
             //}
@@ -131,7 +131,7 @@ namespace SenMonitorowanie
             _accelerometerHandler.StartListening();
             //_audioRecorder.StartRecording();
             _heartRateSensorHandler.StartListening();
-            _gyroscopeSensorHandler.StartListening();
+            //_gyroscopeSensorHandler.StartListening();
             _ambient.StartListening();
             _light.StartListening();
             startTime = DateTime.Now;
@@ -204,7 +204,7 @@ namespace SenMonitorowanie
 
                 _accelerometerHandler.StopListening();
                 _heartRateSensorHandler.StopListening();
-                _gyroscopeSensorHandler.StopListening();
+                //_gyroscopeSensorHandler.StopListening();
                 _ambient.StopListening();
                 _light.StopListening();
 
@@ -293,7 +293,7 @@ namespace SenMonitorowanie
                             .ScaleY(1.0f)
                             .TranslationX(0)
                             .TranslationY(0)
-                            .SetDuration(500); // Wydłuż czas trwania animacji na 1 sekundę
+                            .SetDuration(300); // Wydłuż czas trwania animacji na 1 sekundę
 
                     // Dodanie efektu spowolnienia (jedno odbicie)
                     animator.SetInterpolator(new DecelerateInterpolator());

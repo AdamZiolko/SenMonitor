@@ -31,7 +31,7 @@ namespace SenMonitorowanie
 
             // Znajdź przycisk w fragmencie
             _fragmentMonitoringButton = view.FindViewById<Button>(Resource.Id.startMonitoring);
-            _fragmentMonitoringButton.Text = !_mainActivity.IsMonitoring ? "Start Sleep Monitoring" : "Stop Sleep Monitoring";
+            _fragmentMonitoringButton.Text = !_mainActivity.IsMonitoring ? "Rozpocznij śledzenie snu" : "Zakończ śledzenie snu";
             _fragmentMonitoringButton.Click += async (sender, e) =>
             {
                 Console.WriteLine("Button pressed from Fragment");
@@ -44,7 +44,7 @@ namespace SenMonitorowanie
                   
 
                     _mainActivity.StartSleepMonitoring();
-                    _fragmentMonitoringButton.Text = "Stop Sleep Monitoring";
+                    _fragmentMonitoringButton.Text = "Zakończ śledzenie snu";
                     _mainActivity.IsMonitoring = true;
 
                 }
@@ -55,7 +55,7 @@ namespace SenMonitorowanie
                    // Console.WriteLine("Elapsed Time: " + elapsedTime.ToString());
 
                     _mainActivity.StopSleepMonitoring();
-                    _fragmentMonitoringButton.Text = "Start Sleep Monitoring";
+                    _fragmentMonitoringButton.Text = "Rozpocznij śledzenie snu";
                     _mainActivity.IsMonitoring = false;
 
 

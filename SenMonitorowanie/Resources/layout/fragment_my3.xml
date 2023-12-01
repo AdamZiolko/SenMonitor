@@ -61,8 +61,25 @@
                 android:layout_height="150dp"
                 android:layout_marginTop="10dp" />
 
-        </LinearLayout>
 
+        </LinearLayout>
+        <LinearLayout
+            android:layout_marginTop="20dp"
+            android:id="@+id/secondLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:layout_below="@+id/logoImageView"
+            android:layout_centerHorizontal="true"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF">
+
+            <Microcharts.Droid.ChartView
+                android:id="@+id/chartView2"
+                android:layout_width="190dp"
+                android:layout_height="160dp"
+                android:layout_marginTop="10dp" />
+        </LinearLayout>
 
 
             <!-- Dodany ListView -->

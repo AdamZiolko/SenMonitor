@@ -137,6 +137,18 @@
             android:textSize="10dp"
         />
 
+        <TextView
+            android:id="@+id/lista_move_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💡średnie: 15121"
+            android:layout_gravity="start|top"
+            android:layout_margin="2dp"
+            android:background="#000000"
+            android:padding="5dp"
+            android:textSize="10dp"
+        />
+
 
     <!-- Dodaj więcej elementów, jeśli potrzebujesz -->
 

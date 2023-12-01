@@ -103,7 +103,7 @@ namespace SenMonitorowanie
         }
 
 
-        public void InsertDaneSensorowe(string dateTime, float accX, float accY, float accZ, float gyrX, float gyrY, float gyrZ, float heartRate, float temperature, float light)
+        public void InsertDaneSensorowe(string dateTime, float accX, float accY, float accZ, float heartRate, float temperature, float light)
         {
             using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
             {
@@ -113,12 +113,9 @@ namespace SenMonitorowanie
                 values.Put("acc_x", accX);
                 values.Put("acc_y", accY);
                 values.Put("acc_z", accZ);
-                values.Put("gyr_x", gyrX);
-                values.Put("gyr_y", gyrY);
-                values.Put("gyr_z", gyrZ);
                 values.Put("heart_rate", heartRate);
-                values.Put("temperature", temperature); // Add temperature column
-                values.Put("light", light); // Add light column
+                values.Put("temperature", temperature);
+                values.Put("light", light);
                 db.InsertOrThrow("DaneSensorowe", null, values);
                 db.SetTransactionSuccessful();
                 db.EndTransaction();
@@ -338,28 +335,19 @@ namespace SenMonitorowanie
         public Dictionary<DateTime, int> GetExtremeSensorDataCountPerHour()
         {
             Dictionary<DateTime, int> extremeSensorDataCount = new Dictionary<DateTime, int>();
-
+            double wspolczynnik = 0.4;// .25;
             using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
             {
                 db.BeginTransaction();
 
-                string query =
-                            "WITH SmoothedSensorData AS (" +
+                string query = 
+                    "WITH SmoothedSensorData AS(" +
                     "    SELECT " +
                     "        date_time, " +
                     "        id, " +
-                    "        acc_x, " +
                     "        AVG(acc_x) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS smoothed_acc_x, " +
-                    "        acc_y, " +
                     "        AVG(acc_y) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS smoothed_acc_y, " +
-                    "        acc_z, " +
-                    "        AVG(acc_z) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS smoothed_acc_z, " +
-                    "        gyr_x, " +
-                    "        AVG(gyr_x) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS smoothed_gyr_x, " +
-                    "        gyr_y, " +
-                    "        AVG(gyr_y) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS smoothed_gyr_y, " +
-                    "        gyr_z, " +
-                    "        AVG(gyr_z) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS smoothed_gyr_z " +
+                    "        AVG(acc_z) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS smoothed_acc_z " +
                     "    FROM DaneSensorowe " +
                     ") " +
                     "SELECT " +
@@ -367,35 +355,26 @@ namespace SenMonitorowanie
                     "    ssd.id " +
                     "FROM SmoothedSensorData AS ssd " +
                     "WHERE " +
-                    "    ( " +
-                    "        ((ssd.smoothed_acc_x >= ((SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id - 1)) + 2 ) AND " +
-                    "         (ssd.smoothed_acc_x > ((SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id + 1))) + 2 ) OR " +
-                    "        ((ssd.smoothed_acc_y >= ((SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id - 1)) + 2 ) AND " +
-                    "         (ssd.smoothed_acc_y > ((SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id + 1))) + 2 ) OR " +
-                    "        ((ssd.smoothed_acc_z >= ((SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id - 1)) + 2 ) AND " +
-                    "         (ssd.smoothed_acc_z > ((SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id + 1))) + 2 ) OR " +
-                    "        ((ssd.smoothed_gyr_x >= ((SELECT smoothed_gyr_x FROM SmoothedSensorData WHERE id = ssd.id - 1)) + 2 ) AND " +
-                    "         (ssd.smoothed_gyr_x > ((SELECT smoothed_gyr_x FROM SmoothedSensorData WHERE id = ssd.id + 1))) + 2 ) OR " +
-                    "        ((ssd.smoothed_gyr_y >= ((SELECT smoothed_gyr_y FROM SmoothedSensorData WHERE id = ssd.id - 1)) + 2 ) AND " +
-                    "         (ssd.smoothed_gyr_y > ((SELECT smoothed_gyr_y FROM SmoothedSensorData WHERE id = ssd.id + 1))) + 2 ) OR " +
-                    "        ((ssd.smoothed_gyr_z >= ((SELECT smoothed_gyr_z FROM SmoothedSensorData WHERE id = ssd.id - 1)) + 2 ) AND " +
-                    "         (ssd.smoothed_gyr_z > ((SELECT smoothed_gyr_z FROM SmoothedSensorData WHERE id = ssd.id + 1))) + 2 ) " +
-                    "    ) OR " +
-                    "    ( " +
-                    "        (((ssd.smoothed_acc_x <= (SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id - 1)) - 2) AND " +
-                    "         ((ssd.smoothed_acc_x < (SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id + 1))) - 2) OR " +
-                    "        (((ssd.smoothed_acc_y <= (SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id - 1)) - 2) AND " +
-                    "         ((ssd.smoothed_acc_y < (SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id + 1))) - 2) OR " +
-                    "        (((ssd.smoothed_acc_z <= (SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id - 1)) - 2) AND " +
-                    "         ((ssd.smoothed_acc_z < (SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id + 1))) - 2) OR " +
-                    "        (((ssd.smoothed_gyr_x <= (SELECT smoothed_gyr_x FROM SmoothedSensorData WHERE id = ssd.id - 1)) - 2) AND " +
-                    "         ((ssd.smoothed_gyr_x < (SELECT smoothed_gyr_x FROM SmoothedSensorData WHERE id = ssd.id + 1))) - 2) OR " +
-                    "        (((ssd.smoothed_gyr_y <= (SELECT smoothed_gyr_y FROM SmoothedSensorData WHERE id = ssd.id - 1)) - 2) AND " +
-                    "         ((ssd.smoothed_gyr_y < (SELECT smoothed_gyr_y FROM SmoothedSensorData WHERE id = ssd.id + 1))) - 2) OR " +
-                    "        (((ssd.smoothed_gyr_z <= (SELECT smoothed_gyr_z FROM SmoothedSensorData WHERE id = ssd.id - 1)) - 2) AND " +
-                    "         ((ssd.smoothed_gyr_z < (SELECT smoothed_gyr_z FROM SmoothedSensorData WHERE id = ssd.id + 1)) - 2) " +
-                    "    )) " +
+                    $"    ssd.smoothed_acc_x >= (SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id - 1) + {wspolczynnik} AND " +
+                    $"    ssd.smoothed_acc_x > (SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id + 1) + {wspolczynnik} " +
+                    "    OR " +
+                    $"    ssd.smoothed_acc_y >= (SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id - 1) + {wspolczynnik} AND " +
+                    $"    ssd.smoothed_acc_y > (SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id + 1) + {wspolczynnik} " +
+                    "    OR " +
+                    $"    ssd.smoothed_acc_z >= (SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id - 1) + {wspolczynnik} AND " +
+                    $"    ssd.smoothed_acc_z > (SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id + 1) + {wspolczynnik} " +
+                    "    OR " +
+                    $"    ssd.smoothed_acc_x <= (SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id - 1) - {wspolczynnik} AND " +
+                    $"    ssd.smoothed_acc_x < (SELECT smoothed_acc_x FROM SmoothedSensorData WHERE id = ssd.id + 1) - {wspolczynnik} " +
+                    "    OR " +
+                    $"    ssd.smoothed_acc_y <= (SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id - 1) - {wspolczynnik} AND " +
+                    $"    ssd.smoothed_acc_y < (SELECT smoothed_acc_y FROM SmoothedSensorData WHERE id = ssd.id + 1) - {wspolczynnik} " +
+                    "    OR " +
+                    $"    ssd.smoothed_acc_z <= (SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id - 1) - {wspolczynnik} AND " +
+                    $"    ssd.smoothed_acc_z < (SELECT smoothed_acc_z FROM SmoothedSensorData WHERE id = ssd.id + 1) - {wspolczynnik} " +
                     "ORDER BY ssd.id";
+
+
 
                 using (var cursor = db.RawQuery(query, null))
                 {

@@ -35,7 +35,7 @@ namespace SenMonitorowanie
             }
             else
             {
-                StartForeground(ServiceNotificationId, CreateNotification("Foreground Service", "Service is running"));
+                StartForeground(ServiceNotificationId, CreateNotification("Zbieranie danych z czujników trwa", "Możesz wyłączyć to w aplikacji"));
             }
 
             // Zwróć jeden z kodów wyniku StartCommandResult, na przykład:
@@ -51,9 +51,9 @@ namespace SenMonitorowanie
 
             // Utworzenie powiadomienia dla Foreground Service
             Notification notification = new Notification.Builder(this, "channel_id")
-                .SetContentTitle("Foreground Service")
-                .SetContentText("Service is running")
-                .SetSmallIcon(Resource.Drawable.icon) // Zastąp "my_icon" odpowiednią nazwą swojego pliku graficznego
+                .SetContentTitle("Zbieranie danych z czujników trwa")
+                .SetContentText("Możesz wyłączyć to w aplikacji")
+                .SetSmallIcon(Resource.Drawable.abc_btn_radio_material) // Zastąp "my_icon" odpowiednią nazwą swojego pliku graficznego
                 .Build();
 
             // Rozpocznij usługę w pierwszym planie

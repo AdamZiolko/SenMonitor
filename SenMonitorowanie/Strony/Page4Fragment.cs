@@ -25,7 +25,7 @@ namespace SenMonitorowanie
         private ArrayAdapter<string> adapter; // Zmiana typu adaptera na ArrayAdapter<string>
         private DatabaseManager _databaseManager;
         List<BazaSnowData> daneList;
-
+        Dictionary<DateTime, int> extremeSensorDataCount;
 
         public Page4Fragment(DatabaseManager databaseManager)
         {
@@ -42,11 +42,21 @@ namespace SenMonitorowanie
             listView.Adapter = adapter;
 
             ChartView chartView = view.FindViewById<ChartView>(Resource.Id.chartView);
+            ChartView chartView2 = view.FindViewById<ChartView>(Resource.Id.chartView2);
 
+            extremeSensorDataCount = _databaseManager.GetExtremeSensorDataCountPerHour();
+            /*Random random = new Random();
+            for (int i = 0; i < 3; i++)
+            {
+                DateTime randomDateTime = DateTime.Now.AddHours(i + 1); // Przyjmuję, że chcesz różne daty
+                int randomValue = random.Next(1, 100); // Zakres losowych wartości (możesz dostosować)
 
+                extremeSensorDataCount.Add(randomDateTime, randomValue);
+            }*/
             // Wywołaj funkcję do pobrania danych i ustawienia adaptera
             UpdateListView();
             LoadChartDataAsync(chartView);
+            LoadOtherChartDataAsync(chartView2);
 
 
             return view;
@@ -70,13 +80,27 @@ namespace SenMonitorowanie
             DisplayChart(chartView, extremeHeartRates);
         }
 
+        private async void LoadOtherChartDataAsync(ChartView chartView)
+        {
+            Console.WriteLine("1");
+            // Load data asynchronously for the second chart
+            int iloscRuchow = 0;
+            Console.WriteLine("111");
+            foreach (var entry in extremeSensorDataCount)
+            {
+                Console.WriteLine($"Hour: {entry.Key}, Count: {entry.Value}"); 
+                iloscRuchow += entry.Value;    // ilość wszystkich ruchów
+            }
+            // Process and transform data if needed
+            Console.WriteLine("11");
+            DisplayOtherChart(chartView, extremeSensorDataCount);
+            Console.WriteLine("112");
+        }
 
         private void UpdateListView()
         {
             // Tutaj dostarcz swój DatabaseManager (przykładowo za pomocą konstruktora lub wstrzykiwania zależności)
-            DatabaseManager databaseManager = _databaseManager;
 
-            List<Tuple<DateTime, double>> extremeHeartRates = databaseManager.GetExtremeHeartRatesWithDate();
 
             daneList = _databaseManager.GetLast60DaneSnow();
             CustomAdapter adapter = new CustomAdapter(_databaseManager, daneList);
@@ -103,6 +127,44 @@ namespace SenMonitorowanie
 
             // Powiadom adapter o zmianach
             adapter.NotifyDataSetChanged();
+        }
+
+        private void DisplayOtherChart(ChartView chartView, Dictionary<DateTime, int> data)
+        {
+            var entries = new List<ChartEntry>();
+            int labelInterval = data.Count < 8 ? 1 : data.Count / 8;
+
+            int i = 0;
+            var colors = new List<SKColor>
+            {
+                SKColor.Parse("#2196F3"),
+                SKColor.Parse("#4CAF50"),
+                SKColor.Parse("#FFC107"),
+                // Dodaj więcej kolorów według potrzeb
+            };
+
+            foreach (var entry in data)
+            {
+                int colorIndex = i % colors.Count;
+                entries.Add(new ChartEntry(entry.Value)
+                {
+                    Label = i % labelInterval == 0 ? entry.Key.ToString("HH:mm") : string.Empty,
+                    ValueLabel = i % labelInterval == 0 ? entry.Value.ToString() : string.Empty,
+                    Color = colors[colorIndex],
+                    TextColor = colors[colorIndex],
+                });
+
+                i++;
+            }
+
+            var chart = new BarChart
+            {
+                Entries = entries,
+                BarAreaAlpha = 200,
+                LabelTextSize = 19,
+            };
+
+            chartView.Chart = chart;
         }
 
         private void DisplayChart(ChartView chartView, List<Tuple<DateTime, double>> data)
@@ -185,7 +247,9 @@ namespace SenMonitorowanie
                 (Resource.Id.lista_min_temp, dataItem => $"🌡️ min: {Convert.ToInt32(dataItem.MinTemp)}"),
                 (Resource.Id.lista_max_temp, dataItem => $"🌡️ max: {Convert.ToInt32(dataItem.MaxTemp)}"),
                 (Resource.Id.lista_avg_temp, dataItem => $"🌡️ średnia: {Convert.ToInt32(dataItem.AvgTemp)}"),
-                (Resource.Id.lista_avg_light, dataItem => $"💡średnie: {Convert.ToInt32(dataItem.AvgLight)}")
+                (Resource.Id.lista_avg_light, dataItem => $"💡średnie: {Convert.ToInt32(dataItem.AvgLight)}"),
+                (Resource.Id.lista_move_count, dataItem => $"Ilość ruchów: {Convert.ToInt32(dataItem.MoveCount)}")
+
             };
 
             BazaSnowData dataItem = _data[position];
