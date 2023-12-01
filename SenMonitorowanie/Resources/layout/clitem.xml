@@ -1,18 +1,143 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<GridLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:columnCount="2"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
+    android:alignmentMode="alignMargins"
+    android:layout_marginTop="4dp"
+    android:columnOrderPreserved="false">
 
-	<TextView
+    <TextView
         android:id="@+id/textViewData"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Data: " />
+        android:text="📆:"
+        android:layout_gravity="start|top"
+        android:layout_margin="2dp"
+        android:layout_marginLeft="5dp"
+        android:background="#000000"
+        android:padding="5dp"
 
-	<Microcharts.Droid.ChartView
-        android:id="@+id/chartView"
-        android:layout_width="match_parent"
-        android:layout_height="100dp" />
-</LinearLayout>
+        android:textSize="10dp"/> <!-- Dostosuj odstępy tutaj -->
+
+    <!-- Dodaj inne 11 elementów tutaj z odpowiednimi parametrami układu -->
+
+    <TextView
+        android:id="@+id/listaOcena"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ocena:"
+        android:layout_gravity="start|top"
+        android:layout_margin="2dp"
+        android:background="#000000"
+        android:padding="5dp"
+
+        android:textSize="10dp"/> <!-- Dostosuj odstępy tutaj -->
+
+
+        <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+            <TextView
+                android:id="@+id/lista_min_heart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💙 min: 151"
+                android:layout_gravity="start|top"
+                android:layout_margin="2dp"
+                android:background="#000000"
+                android:padding="5dp"
+
+                android:textSize="10dp"/> <!-- Dostosuj odstępy tutaj -->
+
+            <TextView
+                android:id="@+id/lista_max_heart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💚 max: 151"
+                android:layout_gravity="start|top"
+                android:layout_margin="2dp"
+                android:background="#000000"
+                android:padding="5dp"
+
+                android:textSize="10dp"/> <!-- Dostosuj odstępy tutaj -->
+        </LinearLayout>
+
+        <TextView
+        android:id="@+id/lista_avg_heart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="💖 średnie: 151"
+        android:layout_gravity="start|top"
+        android:layout_margin="2dp"
+        android:background="#000000"
+        android:padding="5dp"
+
+        android:textSize="10dp"/>
+
+            <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+
+        >
+            <TextView
+                android:id="@+id/lista_min_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🌡️ min: 151"
+                android:layout_gravity="start|top"
+                android:layout_margin="2dp"
+                android:background="#000000"
+                android:padding="5dp"
+
+                android:textSize="10dp"/> <!-- Dostosuj odstępy tutaj -->
+
+            <TextView
+                android:id="@+id/lista_max_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🌡️ max: 151"
+                android:layout_gravity="start|top"
+                android:layout_margin="2dp"
+                android:background="#000000"
+                android:padding="5dp"
+                android:textSize="10dp"/> <!-- Dostosuj odstępy tutaj -->
+        </LinearLayout>
+
+        <TextView
+        android:id="@+id/lista_avg_temp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🌡️ średnia: 151"
+        android:layout_gravity="start|top"
+        android:layout_margin="2dp"
+
+        android:background="#000000"
+        android:padding="5dp"
+
+        android:textSize="10dp"/>
+
+        <TextView
+            android:id="@+id/lista_avg_light"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💡średnie: 15121"
+            android:layout_gravity="start|top"
+            android:layout_margin="2dp"
+            android:background="#000000"
+            android:padding="5dp"
+            android:textSize="10dp"
+        />
+
+
+    <!-- Dodaj więcej elementów, jeśli potrzebujesz -->
+
+</GridLayout>

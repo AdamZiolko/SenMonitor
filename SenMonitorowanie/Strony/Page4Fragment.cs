@@ -14,6 +14,8 @@ using Microcharts.Droid;
 using Microcharts;
 using SkiaSharp;
 using System.Threading.Tasks;
+using Android.Graphics;
+using Android.Graphics.Drawables;
 
 namespace SenMonitorowanie
 {
@@ -77,15 +79,15 @@ namespace SenMonitorowanie
             List<Tuple<DateTime, double>> extremeHeartRates = databaseManager.GetExtremeHeartRatesWithDate();
 
             daneList = _databaseManager.GetLast60DaneSnow();
-            //CustomAdapter adapter = new CustomAdapter(_databaseManager, daneList);
-            //listView.Adapter = adapter;
+            CustomAdapter adapter = new CustomAdapter(_databaseManager, daneList);
+            listView.Adapter = adapter;
 
-            //adapter.NotifyDataSetChanged();
+            adapter.NotifyDataSetChanged();
 
             // Przetwórz dane na odpowiedni format stringa i dodaj do adaptera
             //adapter.Add($"{"Data",-6}  {"Długość",3}  {"Ocena",-5}");
 
-            foreach (var dane in daneList)
+           /* foreach (var dane in daneList)
             {
                 int dokładnyCzas = dane.CzasTrwania;
                 TimeSpan czasTrwania = TimeSpan.FromSeconds(dokładnyCzas);
@@ -93,10 +95,11 @@ namespace SenMonitorowanie
                 Console.WriteLine("Czas Poczatku: " + dane.CzasPoczatku);
                 Console.WriteLine("Czas Zakończenia: " + dane.CzasZakonczenia);
 
-                string formattedData = $"Data: {dane.Data.Substring(5, dane.Data.Length - 8)} \nCzas trwania: {koncowyCzasTrwania}h \nOcena: {dane.Ocena}" +
-                    $"\nŚrednie tętno: 45 \nMax tętno: 324 15:47\nMin tętno: -34 \nZnacznych zmian tętna: 32 \nIlość ruchów: 321";
+                string formattedData = $"📆: {dane.Data.Substring(5, dane.Data.Length - 8)} \n🕒: {koncowyCzasTrwania}h \nOcena: {dane.Ocena}" +
+                    $"\n❤️ średnie: {dane.AvgHeartRate} \n❤️ max: {dane.MaxHeartRate}\n❤️ min: {dane.MinHeartRate} \nIlość ruchów: {dane.MoveCount}\n💡średnie: {dane.AvgLight}" +// < 200 For an optimal sleep environment, light intensity should be below 200 lux 
+                    $"\n🌡️ min : {dane.MinTemp}\n🌡️ max: {dane.MaxTemp}\n🌡️ średnia: {dane.AvgTemp}";
                 adapter.Add(formattedData);
-            }
+            }*/
 
             // Powiadom adapter o zmianach
             adapter.NotifyDataSetChanged();
@@ -138,9 +141,18 @@ namespace SenMonitorowanie
         public string Data { get; set; }
         public int CzasTrwania { get; set; }
         public int Ocena { get; set; }
-        public int CzasPoczatku { get; set; } // Dodana właściwość CzasPoczatku
-        public int CzasZakonczenia { get; set; } // Dodana właściwość CzasZakonczenia
+        public int CzasPoczatku { get; set; }
+        public int CzasZakonczenia { get; set; }
+        public float AvgHeartRate { get; set; }
+        public float MinHeartRate { get; set; }
+        public float MaxHeartRate { get; set; }
+        public int MoveCount { get; set; }
+        public float MinTemp { get; set; }
+        public float MaxTemp { get; set; }
+        public float AvgTemp { get; set; }
+        public float AvgLight { get; set; }
     }
+
 
     public class CustomAdapter : BaseAdapter<BazaSnowData>
     {
@@ -163,40 +175,59 @@ namespace SenMonitorowanie
         {
             View view = convertView ?? LayoutInflater.From(parent.Context).Inflate(Resource.Layout.clitem, parent, false);
 
-            TextView textViewData = view.FindViewById<TextView>(Resource.Id.textViewData);
-            ChartView chartView = view.FindViewById<ChartView>(Resource.Id.chartView);
+            List<(int, Func<BazaSnowData, string>)> textViewMappings = new List<(int, Func<BazaSnowData, string>)>
+            {
+                (Resource.Id.textViewData, dataItem => $"📆: {dataItem.Data.Substring(5, dataItem.Data.Length - 8)}"),
+                (Resource.Id.listaOcena, dataItem => $"Ocena: {dataItem.Ocena}"),
+                (Resource.Id.lista_min_heart, dataItem => $"💙 min: {Convert.ToInt32(dataItem.MinHeartRate)}"),
+                (Resource.Id.lista_max_heart, dataItem => $"💚 max: {Convert.ToInt32(dataItem.MaxHeartRate)}"),
+                (Resource.Id.lista_avg_heart, dataItem => $"💖 średnie: {Convert.ToInt32(dataItem.AvgHeartRate)}"),
+                (Resource.Id.lista_min_temp, dataItem => $"🌡️ min: {Convert.ToInt32(dataItem.MinTemp)}"),
+                (Resource.Id.lista_max_temp, dataItem => $"🌡️ max: {Convert.ToInt32(dataItem.MaxTemp)}"),
+                (Resource.Id.lista_avg_temp, dataItem => $"🌡️ średnia: {Convert.ToInt32(dataItem.AvgTemp)}"),
+                (Resource.Id.lista_avg_light, dataItem => $"💡średnie: {Convert.ToInt32(dataItem.AvgLight)}")
+            };
 
-            textViewData.Text = $"Data: {_data[position].Data}";
+            BazaSnowData dataItem = _data[position];
 
-            // Call the GetExtremeHeartRatesWithDate method using the DatabaseManager instance
-            List<Tuple<DateTime, double>> extremeHeartRates = _databaseManager.GetExtremeHeartRatesWithDate();
+            foreach (var mapping in textViewMappings)
+            {
+                TextView textView = view.FindViewById<TextView>(mapping.Item1);
+                textView.Text = mapping.Item2.Invoke(dataItem);
+            }
 
-            // Pass the correct data for the chart
-            DisplayChart(chartView, extremeHeartRates);
+            SetGradientBackground(view, position);
+
 
             return view;
         }
 
-        private void DisplayChart(ChartView chartView, List<Tuple<DateTime, double>> data)
+        private void SetGradientBackground(View view, int position)
         {
-            var entries = new List<ChartEntry>();
+            // Definicje zestawów kolorów dla różnych pozycji
+            int[][] colorSets = {
+                new int[] { Color.Rgb(156, 236, 251), Color.Rgb(101, 199, 247), Color.Rgb(0, 82, 212) },
+                new int[] { Color.Rgb(52, 148, 230), Color.Rgb(236, 110, 173 )},
+                new int[] { Color.Rgb(103, 178, 111), Color.Rgb(76, 162, 205) }
+                // Dodaj inne zestawy kolorów według potrzeb
+            };
 
-            foreach (var tuple in data)
-            {
-                entries.Add(new ChartEntry((float)tuple.Item2)
-                {
-                    Label = tuple.Item1.ToString(),
-                    ValueLabel = tuple.Item2.ToString(),
-                    Color = SKColor.Parse("#FF1493"),
-                });
-            }
+            // Ustawienie indeksu zestawu kolorów na podstawie pozycji
+            int colorSetIndex = position % colorSets.Length;
 
-            var chart = new LineChart { Entries = entries };
-            chart.LabelOrientation = Microcharts.Orientation.Horizontal;
-            chartView.SetBackgroundColor(Android.Graphics.Color.Blue);
+            // Utwórz gradient
+            GradientDrawable gradient = new GradientDrawable(
+                GradientDrawable.Orientation.LeftRight, // Horyzontalny gradient
+                colorSets[colorSetIndex]);
 
-            chartView.Chart = chart;
+            // Ustaw zaokrąglenie narożników (opcjonalne)
+            gradient.SetCornerRadius(0f);
+
+            // Ustaw gradient jako tło widoku
+            view.Background = gradient;
         }
+
+
     }
 
 

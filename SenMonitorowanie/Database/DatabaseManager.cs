@@ -126,21 +126,7 @@ namespace SenMonitorowanie
         }
 
 
-        public double GetAverageRating()
-        {
-            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
-            {
-                string query = "SELECT AVG(Ocena) FROM BazaSnow";
-                using (var cursor = db.RawQuery(query, null))
-                {
-                    if (cursor.MoveToFirst())
-                    {
-                        return cursor.GetDouble(0);
-                    }
-                }
-            }
-            return 0; // Zwracamy 0, gdy nie ma rekordów do obliczenia średniej
-        }
+
 
         public double GetAverageRecordsPerDate()
         {
@@ -167,21 +153,6 @@ namespace SenMonitorowanie
             }
         }
 
-        public double GetAverageDuration()
-        {
-            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
-            {
-                string query = "SELECT AVG(CzasTrwania) FROM BazaSnow";
-                using (var cursor = db.RawQuery(query, null))
-                {
-                    if (cursor.MoveToFirst())
-                    {
-                        return cursor.GetDouble(0);
-                    }
-                }
-            }
-            return 0; // Zwracamy 0, gdy nie ma rekordów do obliczenia średniej
-        }
 
 
         public List<BazaSnowData> GetLast60DaneSnow()
@@ -190,7 +161,7 @@ namespace SenMonitorowanie
             using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
             {
                 db.BeginTransaction();
-                string query = "SELECT Data, CzasTrwania, Ocena, CzasPoczatku, CzasZakonczenia FROM BazaSnow ORDER BY Id DESC LIMIT 60";
+                string query = "SELECT Data, CzasTrwania, Ocena, CzasPoczatku, CzasZakonczenia, avg_heart_rate, max_hear_rate, min_heart_rate, move_count, min_temp, max_temp, avg_temp, avg_light FROM BazaSnow ORDER BY Id DESC LIMIT 60";
                 using (var cursor = db.RawQuery(query, null))
                 {
                     while (cursor.MoveToNext())
@@ -201,7 +172,15 @@ namespace SenMonitorowanie
                             CzasTrwania = cursor.GetInt(cursor.GetColumnIndex("CzasTrwania")),
                             Ocena = cursor.GetInt(cursor.GetColumnIndex("Ocena")),
                             CzasPoczatku = cursor.GetInt(cursor.GetColumnIndex("CzasPoczatku")),
-                            CzasZakonczenia = cursor.GetInt(cursor.GetColumnIndex("CzasZakonczenia"))
+                            CzasZakonczenia = cursor.GetInt(cursor.GetColumnIndex("CzasZakonczenia")),
+                            AvgHeartRate = cursor.GetFloat(cursor.GetColumnIndex("avg_heart_rate")),
+                            MaxHeartRate = cursor.GetFloat(cursor.GetColumnIndex("max_hear_rate")),
+                            MinHeartRate = cursor.GetFloat(cursor.GetColumnIndex("min_heart_rate")),
+                            MoveCount = cursor.GetInt(cursor.GetColumnIndex("move_count")),
+                            MinTemp = cursor.GetFloat(cursor.GetColumnIndex("min_temp")),
+                            MaxTemp = cursor.GetFloat(cursor.GetColumnIndex("max_temp")),
+                            AvgTemp = cursor.GetFloat(cursor.GetColumnIndex("avg_temp")),
+                            AvgLight = cursor.GetFloat(cursor.GetColumnIndex("avg_light"))
                         };
 
                         data.Add(dane);
@@ -212,6 +191,7 @@ namespace SenMonitorowanie
             }
             return data;
         }
+
 
         public void ClearAllBazaSnowData()
         {
@@ -295,11 +275,11 @@ namespace SenMonitorowanie
             return 0; // Return 0 if there are no records
         }
 
-        public double GetAverage(string zmienna)
+        public double GetAverage(string zmienna, string kolumna = "DaneSensorowe")
         {
             using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
             {
-                string query = $"SELECT AVG({zmienna}) FROM DaneSensorowe";
+                string query = $"SELECT AVG({zmienna}) FROM {kolumna}";
                 using (var cursor = db.RawQuery(query, null))
                 {
                     if (cursor.MoveToFirst())

@@ -184,8 +184,8 @@ namespace SenMonitorowanie
                 }
 
                 _databaseManager.InsertDaneSnow(currentDateAsString, seconds, ocenkaSnu, startTimeInSeconds, currentTimeInSeconds,
-                    (float)_databaseManager.GetAverage("heart_rate"), (float)_databaseManager.GetMin("heart_rate"),
-                    (float)_databaseManager.GetMax("heart_rate"), iloscRuchow, (float)_databaseManager.GetMin("temperature "),
+                    (float)_databaseManager.GetAverage("heart_rate"), (float)_databaseManager.GetMax("heart_rate"),
+                    (float)_databaseManager.GetMin("heart_rate"), iloscRuchow, (float)_databaseManager.GetMin("temperature "),
                     (float)_databaseManager.GetMax("temperature "), (float)_databaseManager.GetAverage("temperature"), (float)_databaseManager.GetAverage("light")
                 );
                 // List<Tuple<System.DateTime, double>> extremeHeartRates = _databaseManager.GetExtremeHeartRatesWithDate();
@@ -272,10 +272,6 @@ namespace SenMonitorowanie
                     ViewHelper.SetFontForAllViews(popupView, this);
 
 
-                    int[] location = new int[2];
-                    fab.GetLocationOnScreen(location);
-                    int x = location[0] - popupWindow.Width; // Wyśrodkuj w poziomie
-                    int y = location[1] - popupWindow.Height; // Przesuń menu w górę
                     
                     popupWindow.ShowAtLocation(fab, GravityFlags.CenterHorizontal, 0, 0);
 
@@ -283,8 +279,8 @@ namespace SenMonitorowanie
                     popupView.Alpha = 0.0f;
                     popupView.ScaleX = 0.0f; // Skalowanie X na zero
                     popupView.ScaleY = 0.0f; // Skalowanie Y na zero
-                    popupView.TranslationX = x;
-                    popupView.TranslationY = -y; // Przesunięcie na początek bliżej środka ekranu
+                    popupView.TranslationX = 0;
+                    popupView.TranslationY = 100; // Przesunięcie na początek bliżej środka ekranu
 
                     // Ustawienie punktu odniesienia (pivot point) w środku popupView
                     popupView.PivotX = 0;
@@ -331,7 +327,7 @@ namespace SenMonitorowanie
 
                         // Możesz dodać tutaj dodatkowe operacje związane z zamknięciem menu kontekstowego i animacjami, jeśli są potrzebne
                         popupWindow.Dismiss();
-                        fab.Animate().Alpha(1.0f).SetDuration(300);
+                        fab.Animate().Alpha(1.0f).SetDuration(00);
                         isMenuOpen = false;
                     }
 

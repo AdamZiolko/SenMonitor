@@ -69,9 +69,11 @@
             <ListView
                 android:id="@+id/wypisDanych"
                 android:layout_width="match_parent"
-                android:layout_height="800dp"
+                android:layout_height="4000dp"
                 android:layout_below="@+id/chartView"
                 android:textColor="#FFFFFF"
+                android:dividerHeight="8dp"
+                android:textSize="7dp"
                 android:layout_marginTop="10dp" />
         </LinearLayout>
 
