@@ -34,6 +34,9 @@ namespace SenMonitorowanie
             // Dodaj akcję do przycisku
             ustawienia.Click += (sender, e) => {
                 _databaseManager.ClearAllBazaSnowData();
+                _databaseManager.ClearTable("DaneSerca");
+                _databaseManager.ClearTable("IloscRuchow");
+
                 Toast.MakeText(Context, "Dane zostały usunięte.", ToastLength.Short).Show();
             };
 

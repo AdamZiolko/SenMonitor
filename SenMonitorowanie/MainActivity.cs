@@ -137,6 +137,7 @@ namespace SenMonitorowanie
             startTime = DateTime.Now;
 
 
+
             if (isTimerRunning && timer != null)
             {
                 timer.Stop();
@@ -161,7 +162,9 @@ namespace SenMonitorowanie
                 timer.Dispose();
                 isTimerRunning = false;
 
-
+                int identyfikatorMierzenia = _databaseManager.GetMaxIdentifikator();
+                _databaseManager.InsertExtremeSensorDataToTable(identyfikatorMierzenia+1);
+                _databaseManager.InsertExtremeHeartRatesToTable(identyfikatorMierzenia+1);
 
                 string currentDateAsString = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 TimeSpan duration = DateTime.Now - startTime;
@@ -188,6 +191,8 @@ namespace SenMonitorowanie
                     (float)_databaseManager.GetMin("heart_rate"), iloscRuchow, (float)_databaseManager.GetMin("temperature "),
                     (float)_databaseManager.GetMax("temperature "), (float)_databaseManager.GetAverage("temperature"), (float)_databaseManager.GetAverage("light")
                 );
+
+
                 // List<Tuple<System.DateTime, double>> extremeHeartRates = _databaseManager.GetExtremeHeartRatesWithDate();
                 // _databaseManager.SaveExtremeHeartRatesToDatabase(extremeHeartRates);
                 /*
@@ -210,6 +215,10 @@ namespace SenMonitorowanie
 
                 var serviceIntent = new Intent(this, typeof(MyBackgroundService));
                 StopService(serviceIntent);
+
+
+                _databaseManager.ClearAllDaneSensoroweData();
+
             }
         }
 

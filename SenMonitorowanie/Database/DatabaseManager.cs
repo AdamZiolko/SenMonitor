@@ -378,23 +378,32 @@ namespace SenMonitorowanie
 
                 using (var cursor = db.RawQuery(query, null))
                 {
-                    while (cursor.MoveToNext())
+                    if (cursor.Count == 0)
                     {
-                        DateTime dateTime = DateTime.Parse(cursor.GetString(cursor.GetColumnIndex("date_time")));
-                        int id = cursor.GetInt(cursor.GetColumnIndex("id"));
-
-                        // Extract the hour part from the DateTime
-                        DateTime hourDateTime = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, 0, 0);
-
-                        // Check if the hour is already in the dictionary, if not, add it with a count of 1
-                        if (!extremeSensorDataCount.ContainsKey(hourDateTime))
+                        // Set only the current hour to zero
+                        DateTime currentHour = DateTime.Now;
+                        extremeSensorDataCount[currentHour] = 0;
+                    }
+                    else
+                    {
+                        while (cursor.MoveToNext())
                         {
-                            extremeSensorDataCount[hourDateTime] = 1;
-                        }
-                        else
-                        {
-                            // Increment the count for the existing hour
-                            extremeSensorDataCount[hourDateTime]++;
+                            DateTime dateTime = DateTime.Parse(cursor.GetString(cursor.GetColumnIndex("date_time")));
+                            int id = cursor.GetInt(cursor.GetColumnIndex("id"));
+
+                            // Extract the hour part from the DateTime
+                            DateTime hourDateTime = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, 0, 0);
+
+                            // Check if the hour is already in the dictionary, if not, add it with a count of 1
+                            if (!extremeSensorDataCount.ContainsKey(hourDateTime))
+                            {
+                                extremeSensorDataCount[hourDateTime] = 1;
+                            }
+                            else
+                            {
+                                // Increment the count for the existing hour
+                                extremeSensorDataCount[hourDateTime]++;
+                            }
                         }
                     }
                 }
@@ -407,6 +416,241 @@ namespace SenMonitorowanie
         }
 
 
-    }
+        public void InsertExtremeSensorDataToTable(int customIdentificator)
+        {
+            Dictionary<DateTime, int> extremeSensorDataCount = GetExtremeSensorDataCountPerHour();
+
+            using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
+            {
+                db.BeginTransaction();
+
+                foreach (var entry in extremeSensorDataCount)
+                {
+                    DateTime hourDateTime = entry.Key;
+                    int iloscRuchowNaGodzine = entry.Value;
+
+                    ContentValues values = new ContentValues();
+                    values.Put("IloscRuchowNaGodzine", iloscRuchowNaGodzine);
+                    values.Put("DataPomiaru", hourDateTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                    values.Put("identyfikatorPomiaru", customIdentificator);
+
+                    db.Insert("IloscRuchow", null, values);
+                }
+
+                db.SetTransactionSuccessful();
+                db.EndTransaction();
+            }
+        }
+
+        public Dictionary<DateTime, int> GetIloscRuchowDataPerHour(int offset = 0)
+        {
+            Dictionary<DateTime, int> iloscRuchowData = new Dictionary<DateTime, int>();
+
+            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
+            {
+                db.BeginTransaction();
+
+                string query = $@"
+            SELECT DataPomiaru, IloscRuchowNaGodzine
+            FROM IloscRuchow
+            WHERE identyfikatorPomiaru = (
+                SELECT DISTINCT identyfikatorPomiaru
+                FROM IloscRuchow
+                ORDER BY identyfikatorPomiaru DESC
+                LIMIT 1 OFFSET {offset}
+            );
+        ";
+
+                using (var cursor = db.RawQuery(query, null))
+                {
+                    if (cursor.Count == 0)
+                    {
+                        // If the query returns no rows, insert default values
+                        DateTime currentHour = DateTime.Now;
+                        iloscRuchowData[currentHour] = 0;
+                    }
+                    else
+                    {
+                        while (cursor.MoveToNext())
+                        {
+                            DateTime dataPomiaru = DateTime.Parse(cursor.GetString(cursor.GetColumnIndex("DataPomiaru")));
+                            int iloscRuchowNaGodzine = cursor.GetInt(cursor.GetColumnIndex("IloscRuchowNaGodzine"));
+
+                            // Extract the hour part from the DateTime
+                            DateTime hourDateTime = new DateTime(dataPomiaru.Year, dataPomiaru.Month, dataPomiaru.Day, dataPomiaru.Hour, 0, 0);
+
+                            // Check if the hour is already in the dictionary, if not, add it with a count of 1
+                            if (!iloscRuchowData.ContainsKey(hourDateTime))
+                            {
+                                iloscRuchowData[hourDateTime] = iloscRuchowNaGodzine;
+                            }
+                            else
+                            {
+                                // Increment the count for the existing hour
+                                iloscRuchowData[hourDateTime] += iloscRuchowNaGodzine;
+                            }
+                        }
+                    }
+                }
+
+                db.SetTransactionSuccessful();
+                db.EndTransaction();
+            }
+
+            return iloscRuchowData;
+        }
+
+        public void InsertExtremeHeartRatesToTable(int customIdentificator)
+        {
+            List<Tuple<DateTime, double>> extremeHeartRates = GetExtremeHeartRatesWithDate();
+
+            using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
+            {
+                db.BeginTransaction();
+
+                foreach (var entry in extremeHeartRates)
+                {
+                    DateTime dateTime = entry.Item1;
+                    double smoothedHeartRate = entry.Item2;
+
+                    ContentValues values = new ContentValues();
+                    values.Put("DataCzas", dateTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                    values.Put("SmoothedHeartRate", smoothedHeartRate);
+                    values.Put("Identifikator", customIdentificator);
+
+                    db.Insert("DaneSerca", null, values);
+                }
+
+                db.SetTransactionSuccessful();
+                db.EndTransaction();
+            }
+        }
+
+        public List<Tuple<DateTime, double>> GetExtremeHeartRatesFromTable(int offset = 0)
+        {
+            List<Tuple<DateTime, double>> extremeHeartRates = new List<Tuple<DateTime, double>>();
+
+            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
+            {
+                db.BeginTransaction();
+
+                string query = @$"
+            SELECT DataCzas, SmoothedHeartRate
+            FROM DaneSerca
+            WHERE Identifikator = (
+                SELECT DISTINCT Identifikator
+                FROM DaneSerca
+                ORDER BY Identifikator DESC
+                LIMIT 1 OFFSET {offset}
+            );
+        ";
+
+                using (var cursor = db.RawQuery(query, null))
+                {
+                    if (cursor.Count > 0 && cursor.MoveToFirst()) // Check if there are rows
+                    {
+                        do
+                        {
+                            DateTime dateTime = DateTime.Parse(cursor.GetString(cursor.GetColumnIndex("DataCzas")));
+                            double smoothedHeartRate = cursor.GetDouble(cursor.GetColumnIndex("SmoothedHeartRate"));
+                            extremeHeartRates.Add(new Tuple<DateTime, double>(dateTime, smoothedHeartRate));
+                        } while (cursor.MoveToNext());
+                    }
+                    else
+                    {
+                        // Add default values or handle the empty case as needed
+                        extremeHeartRates.Add(new Tuple<DateTime, double>(DateTime.MinValue, 0.0));
+                    }
+                }
+
+                db.SetTransactionSuccessful();
+                db.EndTransaction();
+            }
+
+            return extremeHeartRates;
+        }
+
+        public int GetDistinctIdentifiersCount()
+        {
+            int distinctIdentifiersCount = 0;
+
+            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
+            {
+                db.BeginTransaction();
+
+                string query = @"
+            SELECT COUNT(DISTINCT Identifikator) AS DistinctIdentifiersCount
+            FROM DaneSerca;
+        ";
+
+                using (var cursor = db.RawQuery(query, null))
+                {
+                    if (cursor.Count > 0 && cursor.MoveToFirst())
+                    {
+                        distinctIdentifiersCount = cursor.GetInt(cursor.GetColumnIndex("DistinctIdentifiersCount"));
+                    }
+                }
+
+                db.SetTransactionSuccessful();
+                db.EndTransaction();
+            }
+
+            return distinctIdentifiersCount;
+        }
+
+        public int GetMaxIdentifikator()
+        {
+            int maxIdentifikator = 0;
+
+            using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
+            {
+                string query = "SELECT MAX(Identifikator) FROM DaneSerca;";
+
+                using (var cursor = db.RawQuery(query, null))
+                {
+                    if (cursor.MoveToFirst())
+                    {
+                        maxIdentifikator = cursor.GetInt(0);
+                    }
+                }
+            }
+
+            return maxIdentifikator;
+        }
+
+
+        public void ClearTable(string tabela)
+        {
+            using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
+            {
+                db.BeginTransaction();
+
+                try
+                {
+                    // Clear all data from the DaneSerca table
+                    db.ExecSQL($"DELETE FROM {tabela};");
+
+                    // Set the transaction as successful
+                    db.SetTransactionSuccessful();
+                }
+                catch (Exception ex)
+                {
+                    // Handle any exceptions that may occur during the transaction
+                    Console.WriteLine($"Error clearing {tabela} table: {ex.Message}");
+                }
+                finally
+                {
+                    // End the transaction
+                    db.EndTransaction();
+                }
+            }
+        }
+
+
+
+
+
 
     }
+
+}

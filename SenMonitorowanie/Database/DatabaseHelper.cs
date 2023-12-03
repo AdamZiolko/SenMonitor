@@ -7,7 +7,7 @@ namespace SenMonitorowanie
     public class DatabaseHelper : SQLiteOpenHelper
     {
         private const string DatabaseName = "SenMonitor.db";
-        private const int DatabaseVersion = 8; // Zwiększenie wersji bazy danych po dodaniu nowej tabeli
+        private const int DatabaseVersion = 10; // Zwiększenie wersji bazy danych po dodaniu nowej tabeli
 
         public DatabaseHelper(Context context) : base(context, DatabaseName, null, DatabaseVersion)
         {
@@ -20,6 +20,8 @@ namespace SenMonitorowanie
 
             // Tworzenie tabeli BazaSnow, jeśli nie istnieje
             db.ExecSQL("CREATE TABLE IF NOT EXISTS BazaSnow (Id INTEGER PRIMARY KEY, Data TEXT, CzasPoczatku INTEGER, CzasZakonczenia INTEGER, CzasTrwania INTEGER, Ocena INTEGER, avg_heart_rate REAL, max_hear_rate REAL, min_heart_rate REAL, move_count INTEGER, min_temp REAL, max_temp REAL, avg_temp REAL, avg_light REAL)");
+            db.ExecSQL("CREATE TABLE IF NOT EXISTS IloscRuchow (Id INTEGER PRIMARY KEY, IloscRuchowNaGodzine INTEGER, DataPomiaru TEXT, identyfikatorPomiaru INTEGER)");
+            db.ExecSQL("CREATE TABLE IF NOT EXISTS DaneSerca (ID INTEGER PRIMARY KEY, DataCzas TEXT, SmoothedHeartRate REAL, Identifikator INTEGER);");
 
             // Tworzenie tabeli DaneSensorowe
             CreateDaneSensoroweTable(db);
@@ -53,10 +55,13 @@ db.ExecSQL("CREATE TABLE IF NOT EXISTS DaneSensorowe (Id INTEGER PRIMARY KEY, da
                 AddColumnIfNotExists(db, "BazaSnow", "avg_light", "REAL");
             }
 
-            if (oldVersion < 8 && newVersion == 8)
+            if (oldVersion < 10 && newVersion == 10)
             {
                 // Dodaj tabelę DaneSensorowe, gdy wersja bazy danych zostanie zaktualizowana z wersji mniejszej niż 6 do 6
-                CreateDaneSensoroweTable(db);
+                db.ExecSQL("CREATE TABLE IF NOT EXISTS IloscRuchow (Id INTEGER PRIMARY KEY, IloscRuchowNaGodzine INTEGER, DataPomiaru TEXT, identyfikatorPomiaru INTEGER)");
+                db.ExecSQL("CREATE TABLE IF NOT EXISTS DaneSerca (ID INTEGER PRIMARY KEY, DataCzas TEXT, SmoothedHeartRate REAL, Identifikator INTEGER);");
+
+
             }
         }
 

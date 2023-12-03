@@ -26,7 +26,8 @@ namespace SenMonitorowanie
         private DatabaseManager _databaseManager;
         List<BazaSnowData> daneList;
         Dictionary<DateTime, int> extremeSensorDataCount;
-
+        private int kolejnyDzien = 0;
+        private int iloscDanych = 8;
         public Page4Fragment(DatabaseManager databaseManager)
         {
             _databaseManager = databaseManager;
@@ -40,11 +41,27 @@ namespace SenMonitorowanie
             listView = view.FindViewById<ListView>(Resource.Id.wypisDanych);
             adapter = new ArrayAdapter<string>(Activity, Android.Resource.Layout.SimpleListItem1);
             listView.Adapter = adapter;
+            iloscDanych = _databaseManager.GetDistinctIdentifiersCount() > 8 ? 8 : _databaseManager.GetDistinctIdentifiersCount();
 
             ChartView chartView = view.FindViewById<ChartView>(Resource.Id.chartView);
             ChartView chartView2 = view.FindViewById<ChartView>(Resource.Id.chartView2);
 
-            extremeSensorDataCount = _databaseManager.GetExtremeSensorDataCountPerHour();
+            extremeSensorDataCount = _databaseManager.GetIloscRuchowDataPerHour();
+
+            Button wyborDnia = view.FindViewById<Button>(Resource.Id.wyborDnia);
+
+            wyborDnia.Click += (sender, e) => {
+                string[] tablicaDni = { "Ostanie mierzenie", "Przedstanie mierzenie", "2 mierzenia temu", "3 mierzenia temu" , "4 mierzenia temu" , "5 mierzeń temu", "6 mierzeń temu", "7 mierzeń temu" };
+                kolejnyDzien++;
+                if (iloscDanych != 0)
+                {
+                    wyborDnia.Text = tablicaDni[kolejnyDzien % iloscDanych];
+                    extremeSensorDataCount = _databaseManager.GetIloscRuchowDataPerHour(kolejnyDzien % iloscDanych);
+
+                    LoadChartDataAsync(chartView, kolejnyDzien % iloscDanych);
+                    LoadOtherChartDataAsync(chartView2, kolejnyDzien % iloscDanych);
+                }
+            };
             /*Random random = new Random();
             for (int i = 0; i < 3; i++)
             {
@@ -62,10 +79,10 @@ namespace SenMonitorowanie
             return view;
         }
 
-        private async void LoadChartDataAsync(ChartView chartView)
+        private async void LoadChartDataAsync(ChartView chartView, int i = 0)
         {
             // Load data asynchronously
-            List<Tuple<DateTime, double>> extremeHeartRates = await Task.Run(() => _databaseManager.GetExtremeHeartRatesWithDate());
+            List<Tuple<DateTime, double>> extremeHeartRates = await Task.Run(() => _databaseManager.GetExtremeHeartRatesFromTable(i));
             daneList = _databaseManager.GetLast60DaneSnow();
             long poczatekSekundy = extremeHeartRates[0].Item1.Ticks / TimeSpan.TicksPerSecond;
 
@@ -80,21 +97,18 @@ namespace SenMonitorowanie
             DisplayChart(chartView, extremeHeartRates);
         }
 
-        private async void LoadOtherChartDataAsync(ChartView chartView)
+        private async void LoadOtherChartDataAsync(ChartView chartView, int i = 0)
         {
-            Console.WriteLine("1");
-            // Load data asynchronously for the second chart
+
+
             int iloscRuchow = 0;
-            Console.WriteLine("111");
             foreach (var entry in extremeSensorDataCount)
             {
                 Console.WriteLine($"Hour: {entry.Key}, Count: {entry.Value}"); 
                 iloscRuchow += entry.Value;    // ilość wszystkich ruchów
             }
             // Process and transform data if needed
-            Console.WriteLine("11");
             DisplayOtherChart(chartView, extremeSensorDataCount);
-            Console.WriteLine("112");
         }
 
         private void UpdateListView()
