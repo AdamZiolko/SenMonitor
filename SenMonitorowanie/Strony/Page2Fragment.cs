@@ -65,14 +65,11 @@ namespace SenMonitorowanie
 
             DateTime currentDate = DateTime.Now;
             string formattedDate = currentDate.ToString("yyyy-MM-dd H:mm:ss");
-            int ocenaSnu = 0;
-
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-            if (selectedHour <= 23 && selectedHour >= 20) ocenaSnu += 1;                                    // odpowiednia pora snu
-            if (okraglyCzas <= 9 && okraglyCzas >= 7) ocenaSnu += 1;                                        // odpowiedni czas snu
-            if (_databaseManager.GetLatestDane("BazaSnow", "Data") != formattedDate) ocenaSnu += 1;         // nie za duża ilosc snow na dzien 
-            if (Int32.Parse(_databaseManager.GetLatestDane("BazaSnow", "Ocena")) >= ocenaSnu) ocenaSnu += 1;// punkty za utrzymanie oceny snu z dnia poprzedniego
-            ////////////////////////////////////////////////////////////////////////////////////////////////
+            int ocenaSnu = OcenaSnu.EvaluateSleep(
+                selectedHour, 
+                okraglyCzas, 
+                Int32.Parse(_databaseManager.GetLatestDane("BazaSnow", "Ocena"))
+            );
 
             _databaseManager.InsertDaneSnow(formattedDate, czaswSekundach, ocenaSnu, czasPoczatku, czasZakonczenia);
 

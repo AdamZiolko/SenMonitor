@@ -1,8 +1,6 @@
 ﻿using Android.Content;
 using Android.Database;
 using Android.Database.Sqlite;
-using Android.Util;
-using SenMonitorowanie;
 using System.Collections.Generic;
 using System;
 
@@ -148,13 +146,13 @@ namespace SenMonitorowanie
 
 
 
-        public List<BazaSnowData> GetLast60DaneSnow()
+        public List<BazaSnowData> GetLastDaneSnow(int iloscDanych)
         {
             List<BazaSnowData> data = new List<BazaSnowData>();
             using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
             {
                 db.BeginTransaction();
-                string query = "SELECT Data, CzasTrwania, Ocena, CzasPoczatku, CzasZakonczenia, avg_heart_rate, max_hear_rate, min_heart_rate, move_count, min_temp, max_temp, avg_temp, avg_light FROM BazaSnow ORDER BY Id DESC LIMIT 60";
+                string query = $"SELECT Data, CzasTrwania, Ocena, CzasPoczatku, CzasZakonczenia, avg_heart_rate, max_hear_rate, min_heart_rate, move_count, min_temp, max_temp, avg_temp, avg_light FROM BazaSnow ORDER BY Id DESC LIMIT {iloscDanych}";
                 using (var cursor = db.RawQuery(query, null))
                 {
                     while (cursor.MoveToNext())
@@ -600,12 +598,11 @@ namespace SenMonitorowanie
                     // Your DELETE statement with a subquery to keep the latest 8 rows
                     db.ExecSQL($@"
                 DELETE FROM {tableName}
-                WHERE {unikalneId} NOT IN (
+                WHERE {unikalneId} < ((
                     SELECT {unikalneId}
                     FROM {tableName}
                     ORDER BY {unikalneId} DESC
-                    LIMIT 8
-                );
+                ) - 7);
             ");
 
                     // Set the transaction as successful

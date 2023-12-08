@@ -1,15 +1,10 @@
 ﻿using Android.App;
-using Android.Content;
 using Android.OS;
-using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Android.App;
-using System.Runtime.InteropServices;
 using Microcharts.Droid;
 using Microcharts;
 using SkiaSharp;
@@ -42,7 +37,7 @@ namespace SenMonitorowanie
             adapter = new ArrayAdapter<string>(Activity, Android.Resource.Layout.SimpleListItem1);
             listView.Adapter = adapter;
             iloscDanych = _databaseManager.GetDistinctIdentifiersCount() > 8 ? 8 : _databaseManager.GetDistinctIdentifiersCount();
-
+            Console.WriteLine(_databaseManager.GetDistinctIdentifiersCount());
             ChartView chartView = view.FindViewById<ChartView>(Resource.Id.chartView);
             ChartView chartView2 = view.FindViewById<ChartView>(Resource.Id.chartView2);
 
@@ -74,7 +69,7 @@ namespace SenMonitorowanie
         {
             // Load data asynchronously
             List<Tuple<DateTime, double>> extremeHeartRates = await Task.Run(() => _databaseManager.GetExtremeHeartRatesFromTable(i));
-            daneList = _databaseManager.GetLast60DaneSnow();
+            daneList = _databaseManager.GetLastDaneSnow(60);
             long poczatekSekundy = extremeHeartRates[0].Item1.Ticks / TimeSpan.TicksPerSecond;
             DateTime poczatekCzasuUnixowego = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -91,7 +86,7 @@ namespace SenMonitorowanie
 
         private void UpdateListView()
         {
-            daneList = _databaseManager.GetLast60DaneSnow();
+            daneList = _databaseManager.GetLastDaneSnow(60);
             CustomAdapter adapter = new CustomAdapter(_databaseManager, daneList);
             listView.Adapter = adapter;
 
@@ -226,13 +221,13 @@ namespace SenMonitorowanie
 
         private void SetGradientBackground(View view, int position)
         {
-            // Definicje zestawów kolorów dla różnych pozycji
+            // Definicje zestawów kolorów dla różnych pozycji z przezroczystością (ostatnia wartość to przezroczystość)
             int[][] colorSets = {
-                new int[] { Color.Rgb(156, 236, 251), Color.Rgb(101, 199, 247), Color.Rgb(0, 82, 212) },
-                new int[] { Color.Rgb(52, 148, 230), Color.Rgb(236, 110, 173 )},
-                new int[] { Color.Rgb(103, 178, 111), Color.Rgb(76, 162, 205) }
-                // Dodaj inne zestawy kolorów według potrzeb
-            };
+            new int[] { Color.Rgb(156, 236, 251), Color.Rgb(101, 199, 247), Color.Rgb(0, 82, 212), Color.Argb(0, 0, 0, 0) },
+            new int[] { Color.Rgb(52, 148, 230), Color.Rgb(236, 110, 173), Color.Argb(0, 0, 0, 0) },
+            new int[] { Color.Rgb(103, 178, 111), Color.Rgb(76, 162, 205), Color.Argb(0, 0, 0, 0) }
+            // Dodaj inne zestawy kolorów według potrzeb
+        };
 
             // Ustawienie indeksu zestawu kolorów na podstawie pozycji
             int colorSetIndex = position % colorSets.Length;
@@ -243,10 +238,11 @@ namespace SenMonitorowanie
                 colorSets[colorSetIndex]);
 
             // Ustaw zaokrąglenie narożników (opcjonalne)
-            gradient.SetCornerRadius(30f);
+            gradient.SetCornerRadius(00f);
 
             // Ustaw gradient jako tło widoku
             view.Background = gradient;
         }
+
     }
 }

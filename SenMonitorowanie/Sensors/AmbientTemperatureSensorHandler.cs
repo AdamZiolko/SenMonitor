@@ -1,9 +1,5 @@
-﻿using Android.Content;
-using Android.Hardware;
+﻿using Android.Hardware;
 using Android.Runtime;
-using Java.Util.Concurrent;
-using SenMonitorowanie; // Ensure that this namespace is correct for your project
-using System.Collections.Generic;
 
 public class AmbientTemperatureSensorHandler : Java.Lang.Object, ISensorEventListener
 {

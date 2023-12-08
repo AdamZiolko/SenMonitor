@@ -60,6 +60,7 @@
     <Compile Include="Database\DatabaseHelper.cs" />
     <Compile Include="Database\DatabaseManager.cs" />
     <Compile Include="FontManager.cs" />
+    <Compile Include="OcenaSnu.cs" />
     <Compile Include="Sensors\AmbientTemperatureSensorHandler.cs" />
     <Compile Include="Sensors\LightSensorHandler.cs" />
     <Compile Include="UslugaTla.cs" />

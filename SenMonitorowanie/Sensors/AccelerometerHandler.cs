@@ -1,12 +1,6 @@
-﻿using Android.Content;
-using Android.Hardware;
+﻿using Android.Hardware;
 using Android.Runtime;
-using Android.Widget;
-using SenMonitorowanie;
-using System;
 using System.Collections.Generic;
-using System.Reflection;
-using Java.Util.Concurrent;
 
 public class AccelerometerHandler : Java.Lang.Object, ISensorEventListener
 {

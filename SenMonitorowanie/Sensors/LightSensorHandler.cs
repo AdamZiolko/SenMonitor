@@ -1,9 +1,5 @@
-﻿using Android.Content;
-using Android.Hardware;
+﻿using Android.Hardware;
 using Android.Runtime;
-using Java.Util.Concurrent;
-using SenMonitorowanie;
-using System.Collections.Generic;
 
 public class LightSensorHandler : Java.Lang.Object, ISensorEventListener
 {
@@ -42,11 +38,8 @@ public class LightSensorHandler : Java.Lang.Object, ISensorEventListener
         {
             float lightIntensity = e.Values[0];
 
-            // Przypisanie wartości bezpośrednio do pola _lightSensorData
             _lightSensorData = lightIntensity;
 
-            // Tutaj możesz również zapisywać dane do bazy danych, jeśli to potrzebne
-            // _databaseManager.SaveLightSensorData(lightIntensity);
         }
     }
 }

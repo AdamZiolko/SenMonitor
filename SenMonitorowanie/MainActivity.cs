@@ -5,11 +5,8 @@ using Android.OS;
 using Android.Support.Wearable.Activity;
 using Android.Hardware;
 using Android.Runtime;
-using AndroidX.AppCompat.App;
-using Google.Android.Material.FloatingActionButton;
 using Android.Views.Animations;
 using Android.Views;
-using static Android.App.FragmentManager;
 using AndroidX.AppCompat.Widget;
 using Android.Content;
 using System.Collections.Generic;
@@ -35,7 +32,6 @@ namespace SenMonitorowanie
         private DateTime startTime;
         DateTime startDate = DateTime.Today;
         public bool IsMonitoring = false;
-        const int BODY_SENSORS_PERMISSION_REQUEST_CODE = 2;
 
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -144,7 +140,6 @@ namespace SenMonitorowanie
                 string currentDateAsString = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 TimeSpan duration = DateTime.Now - startTime;
                 int seconds = (int)duration.TotalSeconds;
-                int ocenkaSnu = 5;
                 int startTimeInSeconds = (int)(startTime - startDate).TotalSeconds;
                 int currentTimeInSeconds = (int)(DateTime.Now - startDate).TotalSeconds;
 
@@ -156,20 +151,37 @@ namespace SenMonitorowanie
                     iloscRuchow += entry.Value;    // ilość wszystkich ruchów
                 }
 
+                float averageTemperature = (float)_databaseManager.GetAverage("temperature");
+                float averageLight = (float)_databaseManager.GetAverage("light");
+                float minHeartRate = (float)_databaseManager.GetMin("heart_rate");
+                float maxHeartRate = (float)_databaseManager.GetMax("heart_rate");
+
+                int ocenkaSnu = OcenaSnu.EvaluateSleep(
+                    startTimeInSeconds,
+                    seconds,
+                    Int32.Parse(_databaseManager.GetLatestDane("BazaSnow", "Ocena")),
+                    iloscRuchow,
+                    averageTemperature,
+                    averageLight,
+                    minHeartRate,
+                    maxHeartRate
+                );
+
+
                 _databaseManager.InsertDaneSnow(
                     currentDateAsString, 
                     seconds, 
                     ocenkaSnu, 
                     startTimeInSeconds, 
                     currentTimeInSeconds,
-                    (float)_databaseManager.GetAverage("heart_rate"), 
-                    (float)_databaseManager.GetMax("heart_rate"),
-                    (float)_databaseManager.GetMin("heart_rate"), 
+                    (float)_databaseManager.GetAverage("heart_rate"),
+                    maxHeartRate,
+                    minHeartRate, 
                     iloscRuchow, 
                     (float)_databaseManager.GetMin("temperature "),
-                    (float)_databaseManager.GetMax("temperature "), 
-                    (float)_databaseManager.GetAverage("temperature"), 
-                    (float)_databaseManager.GetAverage("light")
+                    (float)_databaseManager.GetMax("temperature "),
+                    averageTemperature,
+                    averageLight
                 );
 
 

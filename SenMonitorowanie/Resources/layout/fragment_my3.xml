@@ -24,18 +24,20 @@
             android:background="#03459C">
 
 
-            <TextView
-                android:id="@+id/OstatniSen"
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:textSize="13dp"
-                android:textStyle="bold"
-                android:layout_centerHorizontal="true"
-                android:textColor="#FFFFFF"
-                android:layout_marginTop="20dp"
-                android:text="Wybierz jedno z ostatnich 7 mierzeń z sensorami:" />
+        <TextView
+            android:id="@+id/OstatniSen"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:textSize="13dp"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="20dp"
+            android:text="Wybierz jedno z ostatnich 7 mierzeń z sensorami:"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"/>
             
-                    <Button 
+        <Button 
             android:id="@+id/wyborDnia"
             android:layout_width="120dp"
             android:layout_height="60dp"
@@ -43,7 +45,7 @@
             android:layout_below="@+id/heightTextView"
             android:layout_centerHorizontal="true"
             android:textSize="9dp"        
-            android:text="Wybieraj tutaj" />
+            android:text="Ostatnie mierzenie" />
 
         <LinearLayout
             android:layout_marginTop="20dp"
@@ -93,7 +95,8 @@
                 android:textColor="#FFFFFF"
                 android:dividerHeight="8dp"
                 android:textSize="7dp"
-                android:layout_marginTop="10dp" />
+                android:layout_marginTop="10dp"
+                android:divider="#000000" />
         </LinearLayout>
 
     </RelativeLayout>
