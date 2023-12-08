@@ -12,17 +12,11 @@ public class AccelerometerHandler : Java.Lang.Object, ISensorEventListener
 {
     private SensorManager _sensorManager;
     private List<float> _accelerometerData; // Change the type to List<List<float>>
-    private int counter = 0;
-    private DatabaseManager _databaseManager;
-    public AccelerometerHandler(SensorManager sensorManager, DatabaseManager databaseManager)
+    public AccelerometerHandler(SensorManager sensorManager)
     {
         _sensorManager = sensorManager;
-       // _accelerometerDataTextView = accelerometerDataTextView;
-        _databaseManager = databaseManager;
         _accelerometerData = new List<float>(); // Initialize as a List<List<float>>
-
     }
-
 
     public void StartListening()
     {
@@ -53,10 +47,7 @@ public class AccelerometerHandler : Java.Lang.Object, ISensorEventListener
             float z = e.Values[2];
 
             List<float> accelerometerValues = new List<float> { x, y, z };
-
-            // Add the accelerometer data to the list
             _accelerometerData = accelerometerValues;
-
         }
     }
 }

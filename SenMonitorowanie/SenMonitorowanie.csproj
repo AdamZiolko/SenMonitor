@@ -67,8 +67,6 @@
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sensors\AccelerometerHandler.cs" />
-    <Compile Include="Sensors\AudioRecorder.cs" />
-    <Compile Include="Sensors\GyroscopeSensorHandler .cs" />
     <Compile Include="Sensors\HeartRateSensorHandler.cs" />
     <Compile Include="Strony\monitoringScreen.cs" />
     <Compile Include="Strony\Page2Fragment.cs" />

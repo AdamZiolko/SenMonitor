@@ -11,6 +11,7 @@ using System.Text;
 using Android.App;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Android.Preferences;
 
 namespace SenMonitorowanie
 {
@@ -22,56 +23,38 @@ namespace SenMonitorowanie
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             View view = inflater.Inflate(Resource.Layout.monitoringScreen, container, false);
-            ViewHelper.SetFontForAllViews(view, Activity);
-
+            var preferences = PreferenceManager.GetDefaultSharedPreferences(Application.Context);
+            var savedFontPath = preferences.GetString("CurrentFontPath", "");
+            if (!string.IsNullOrEmpty(savedFontPath))
+            {
+                AppSettings.CurrentFontPath = savedFontPath;
+                ViewHelper.SetFontForAllViews(view, Activity);
+            }
             _mainActivity = (MainActivity)Activity;
 
-            //System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-
-
-            // Znajdź przycisk w fragmencie
             _fragmentMonitoringButton = view.FindViewById<Button>(Resource.Id.startMonitoring);
             _fragmentMonitoringButton.Text = !_mainActivity.IsMonitoring ? "Rozpocznij śledzenie snu" : "Zakończ śledzenie snu";
             _fragmentMonitoringButton.Click += async (sender, e) =>
             {
-                Console.WriteLine("Button pressed from Fragment");
                 _fragmentMonitoringButton.Enabled = false;
 
                 if (!_mainActivity.IsMonitoring)
                 {
-                    //stopwatch.Start();
-
-                  
-
                     _mainActivity.StartSleepMonitoring();
                     _fragmentMonitoringButton.Text = "Zakończ śledzenie snu";
                     _mainActivity.IsMonitoring = true;
-
                 }
                 else
                 {
-                    //stopwatch.Stop();
-                    //TimeSpan elapsedTime = stopwatch.Elapsed;
-                   // Console.WriteLine("Elapsed Time: " + elapsedTime.ToString());
-
                     _mainActivity.StopSleepMonitoring();
                     _fragmentMonitoringButton.Text = "Rozpocznij śledzenie snu";
                     _mainActivity.IsMonitoring = false;
-
-
-                   // stopwatch.Reset();
-
-
                 }
 
                 await DelayAsync(1000);
-
-                // Odblokuj przycisk po 5 sekundach
+                // Odblokuj przycisk po czasie z DelayAsync
                 _fragmentMonitoringButton.Enabled = true;
-            };
-
-            // Metoda asynchroniczna do opóźnienia
-            
+            };            
             return view;
         }
         private async Task DelayAsync(int milliseconds)

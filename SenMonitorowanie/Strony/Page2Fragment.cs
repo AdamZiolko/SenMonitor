@@ -13,7 +13,7 @@ namespace SenMonitorowanie
         private int selectedHour = 0;
         private int selectedMinute = 0;
         private DatabaseManager _databaseManager;
-
+        private Button displayTimeButton;
         public Page2Fragment(DatabaseManager databaseManager)
         {
             _databaseManager = databaseManager;
@@ -24,15 +24,13 @@ namespace SenMonitorowanie
             View view = inflater.Inflate(Resource.Layout.fragment_my, container, false);
             ViewHelper.SetFontForAllViews(view, Activity);
 
-            // Znajdź TimePicker w widoku fragmentu
             timePicker = view.FindViewById<TimePicker>(Resource.Id.timePicker1);
             timePicker2 = view.FindViewById<TimePicker>(Resource.Id.timePicker2);
 
             // Ustaw handler dla zdarzenia zmiany czasu
             timePicker.TimeChanged += TimePicker_TimeChanged;
 
-            // Znajdź przycisk w widoku fragmentu
-            Button displayTimeButton = view.FindViewById<Button>(Resource.Id.select_button);
+            displayTimeButton = view.FindViewById<Button>(Resource.Id.select_button);
 
             // Ustaw handler dla zdarzenia kliknięcia przycisku
             displayTimeButton.Click += DisplayTimeButton_Click;
@@ -42,21 +40,18 @@ namespace SenMonitorowanie
 
         private void TimePicker_TimeChanged(object sender, TimePicker.TimeChangedEventArgs e)
         {
-            // Zapisz wybrane wartości godziny i minuty
             selectedHour = e.HourOfDay;
             selectedMinute = e.Minute;
         }
 
         private void DisplayTimeButton_Click(object sender, EventArgs e)
         {
-            // Pobierz wartości z drugiego TimePicker
             int selectedHour2 = timePicker2.Hour;
             int selectedMinute2 = timePicker2.Minute;
             int czasWMinutach = 0;
             int czasPoczatku = (selectedHour * 60 + selectedMinute) * 60;
             int czasZakonczenia = (selectedHour2 * 60 + selectedMinute2) * 60;
 
-            // Dodaj godziny i minuty z obu TimePickers
             if (selectedHour * 60 + selectedMinute >= selectedHour2 * 60 + selectedMinute2 )
             {
                 czasWMinutach = (24 * 60 - (selectedHour * 60 + selectedMinute))  + selectedHour2 * 60 + selectedMinute2;
@@ -69,8 +64,6 @@ namespace SenMonitorowanie
 
 
             DateTime currentDate = DateTime.Now;
-
-            // Konwertuj datę na łańcuch tekstowy w formacie "yyyy-MM-dd"
             string formattedDate = currentDate.ToString("yyyy-MM-dd H:mm:ss");
             int ocenaSnu = 0;
 
@@ -81,13 +74,10 @@ namespace SenMonitorowanie
             if (Int32.Parse(_databaseManager.GetLatestDane("BazaSnow", "Ocena")) >= ocenaSnu) ocenaSnu += 1;// punkty za utrzymanie oceny snu z dnia poprzedniego
             ////////////////////////////////////////////////////////////////////////////////////////////////
 
-            ///
             _databaseManager.InsertDaneSnow(formattedDate, czaswSekundach, ocenaSnu, czasPoczatku, czasZakonczenia);
 
             TimeSpan czasTrwania = TimeSpan.FromSeconds(czaswSekundach);
             string koncowyCzasTrwania = $"{(int)czasTrwania.TotalHours}:{czasTrwania.Minutes:D2}";
-
-            // Wyświetl wybrane wartości godziny i minuty
             string timeMessage = $"Suma godzin: {koncowyCzasTrwania}";
             Toast.MakeText(Context, timeMessage, ToastLength.Short).Show();
         }

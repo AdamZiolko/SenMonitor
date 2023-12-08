@@ -41,12 +41,7 @@ public class AmbientTemperatureSensorHandler : Java.Lang.Object, ISensorEventLis
         if (e.Sensor.Type == SensorType.AmbientTemperature)
         {
             float ambientTemperature = e.Values[0];
-
-            // Assign the value directly to the _ambientTemperatureData field
             _ambientTemperatureData = ambientTemperature;
-
-            // You can also save the data to a database here if needed
-            // _databaseManager.SaveAmbientTemperatureData(ambientTemperature);
         }
     }
 }

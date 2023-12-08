@@ -36,10 +36,7 @@ namespace SenMonitorowanie
                     {
                         SetFontForTextView(textView, context, fontPath);
                     }
-                    else if (childView is ListView listView)
-                    {
-                        SetFontForListView(listView, context, fontPath);
-                    }
+
 
                     if (childView is ViewGroup)
                     {
@@ -59,11 +56,6 @@ namespace SenMonitorowanie
         {
             Typeface typeface = Typeface.CreateFromAsset(context.Assets, fontPath);
             textView.Typeface = typeface;
-        }
-
-        private static void SetFontForListView(ListView listView, Context context, string fontPath)
-        {
-            //
         }
     }
 

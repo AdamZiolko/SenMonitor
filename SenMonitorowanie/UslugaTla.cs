@@ -26,8 +26,6 @@ namespace SenMonitorowanie
 
         public override StartCommandResult OnStartCommand(Intent intent, StartCommandFlags flags, int startId)
         {
-            // Umieść kod, który ma być wykonywany w tle
-
             // Rozpocznij usługę w pierwszym planie
             if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
             {
@@ -64,7 +62,6 @@ namespace SenMonitorowanie
         {
             // Zatrzymaj usługę w pierwszym planie, gdy usługa jest zatrzymywana
             StopForeground(true);
-
             base.OnDestroy();
         }
 
@@ -90,8 +87,5 @@ namespace SenMonitorowanie
 
             return builder.Build();
         }
-
-        // Reszta kodu
     }
-
 }

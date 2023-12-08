@@ -11,6 +11,7 @@ using System.Text;
 using Android.App;
 using Android.Graphics;
 using Android.Util;
+using Android.Preferences;
 
 namespace SenMonitorowanie
 {
@@ -27,13 +28,12 @@ namespace SenMonitorowanie
             View view = inflater.Inflate(Resource.Layout.fragment_my4, container, false);
             ViewHelper.SetFontForAllViews(view, Activity);
 
-            // Znajdź przycisk w fragmencie
             Button ustawienia = view.FindViewById<Button>(Resource.Id.Ustawione);
             Button czcionka = view.FindViewById<Button>(Resource.Id.toggleFontButton);
 
             // Dodaj akcję do przycisku
             ustawienia.Click += (sender, e) => {
-                _databaseManager.ClearAllBazaSnowData();
+                _databaseManager.ClearTable("BazaSnow");
                 _databaseManager.ClearTable("DaneSerca");
                 _databaseManager.ClearTable("IloscRuchow");
 
@@ -41,20 +41,28 @@ namespace SenMonitorowanie
             };
 
             czcionka.Click += (sender, e) => {
-                string[] tablicaCzcionek = { "fonts/AlegreyaSans-ExtraBold.ttf", "fonts/Anonymous_Pro.ttf", "fonts/RobotoCondensed-Regular.ttf", "fonts/Mulish-ExtraBold.ttf", "fonts/zai_ConsulPolishTypewriter.ttf" };
-                ++kolejnaCzcionka;
-                Console.WriteLine(kolejnaCzcionka % 5);
-                AppSettings.CurrentFontPath = tablicaCzcionek[kolejnaCzcionka%5];
+                string[] tablicaCzcionek = { 
+                    "AlegreyaSans-ExtraBold.ttf", 
+                    "Anonymous_Pro.ttf", 
+                    "RobotoCondensed-Regular.ttf", 
+                    "Mulish-ExtraBold.ttf", 
+                    "zai_ConsulPolishTypewriter.ttf" 
+                };
+
+                kolejnaCzcionka++;
+                int index = kolejnaCzcionka % 5;
+
+                AppSettings.CurrentFontPath = "fonts/" + tablicaCzcionek[index];
                 ViewHelper.SetFontForAllViews(view, Activity);
 
-                //Toast.MakeText(Context, "Czcionka została zmieniona.", ToastLength.Short).Show();
+                // Zapisanie informacji o aktualnej czcionce do SharedPreferences
+                var preferences = PreferenceManager.GetDefaultSharedPreferences(Application.Context);
+                var editor = preferences.Edit();
+                editor.PutString("CurrentFontPath", AppSettings.CurrentFontPath);
+                editor.Apply();
             };
 
             return view;
         }
     }
-
-
-
-
 }

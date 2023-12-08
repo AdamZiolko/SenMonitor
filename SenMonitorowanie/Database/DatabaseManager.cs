@@ -42,10 +42,6 @@ namespace SenMonitorowanie
             return data;
         }
 
-
-
-
-
         public void InsertDaneSnow(string data, int czasTrwania, int ocena, int czasPoczatku, int czasZakonczenia)
         {
             using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
@@ -188,53 +184,28 @@ namespace SenMonitorowanie
             }
             return data;
         }
-
-
-        public void ClearAllBazaSnowData()
+        public void ClearTable(string tabela)
         {
             using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
             {
                 db.BeginTransaction();
+
                 try
                 {
-                    string clearQuery = "DELETE FROM BazaSnow";
-                    db.ExecSQL(clearQuery);
+                    // Clear all data from the DaneSerca table
+                    db.ExecSQL($"DELETE FROM {tabela};");
+
+                    // Set the transaction as successful
                     db.SetTransactionSuccessful();
                 }
                 catch (Exception ex)
                 {
-                    // Obsługa wyjątku, jeśli to konieczne
-                    Console.WriteLine($"Error clearing BazaSnow table: {ex.Message}");
+                    // Handle any exceptions that may occur during the transaction
+                    Console.WriteLine($"Error clearing {tabela} table: {ex.Message}");
                 }
                 finally
                 {
-                    db.EndTransaction();
-                }
-            }
-        }
-
-
-        public void ClearAllDaneSensoroweData()
-        {
-            using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
-            {
-                db.BeginTransaction();
-                try
-                {
-                    // Usuwanie wszystkich rekordów z tabeli "DaneSensorowe"
-                    db.Delete("DaneSensorowe", null, null);
-
-                    // Ustawianie transakcji jako udanej
-                    db.SetTransactionSuccessful();
-                }
-                catch (Exception ex)
-                {
-                    // Obsługa błędów, np. logowanie błędu
-                    Console.WriteLine("Error clearing DaneSensorowe data: " + ex.Message);
-                }
-                finally
-                {
-                    // Zakończenie transakcji
+                    // End the transaction
                     db.EndTransaction();
                 }
             }
@@ -600,7 +571,7 @@ namespace SenMonitorowanie
 
         public int GetMaxIdentifikator()
         {
-            int maxIdentifikator = 0;
+            int maxIdentifikator = 0;/////....
 
             using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
             {
@@ -618,8 +589,7 @@ namespace SenMonitorowanie
             return maxIdentifikator;
         }
 
-
-        public void ClearTable(string tabela)
+        public void ClearWykresTable(string tableName = "IloscRuchow", string unikalneId = "identyfikatorPomiaru")
         {
             using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
             {
@@ -627,8 +597,16 @@ namespace SenMonitorowanie
 
                 try
                 {
-                    // Clear all data from the DaneSerca table
-                    db.ExecSQL($"DELETE FROM {tabela};");
+                    // Your DELETE statement with a subquery to keep the latest 8 rows
+                    db.ExecSQL($@"
+                DELETE FROM {tableName}
+                WHERE {unikalneId} NOT IN (
+                    SELECT {unikalneId}
+                    FROM {tableName}
+                    ORDER BY {unikalneId} DESC
+                    LIMIT 8
+                );
+            ");
 
                     // Set the transaction as successful
                     db.SetTransactionSuccessful();
@@ -636,7 +614,7 @@ namespace SenMonitorowanie
                 catch (Exception ex)
                 {
                     // Handle any exceptions that may occur during the transaction
-                    Console.WriteLine($"Error clearing {tabela} table: {ex.Message}");
+                    Console.WriteLine($"Error clearing {tableName} table: {ex.Message}");
                 }
                 finally
                 {
@@ -645,12 +623,5 @@ namespace SenMonitorowanie
                 }
             }
         }
-
-
-
-
-
-
     }
-
 }

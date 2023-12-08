@@ -31,10 +31,7 @@ namespace SenMonitorowanie
             view.FindViewById<TextView>(Resource.Id.iloscSnow).Text = $"Mierzenie spania: {_databaseManager.GetRecordCount()} razy";
             view.FindViewById<TextView>(Resource.Id.senNaDzien).Text = $"Średnia ilość spania na dzień: {(_databaseManager.GetAverageRecordsPerDate()).ToString("F2")}";
 
-
             return view;
         }
-
-
     }
 }

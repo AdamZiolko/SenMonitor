@@ -62,19 +62,10 @@ namespace SenMonitorowanie
                     LoadOtherChartDataAsync(chartView2, kolejnyDzien % iloscDanych);
                 }
             };
-            /*Random random = new Random();
-            for (int i = 0; i < 3; i++)
-            {
-                DateTime randomDateTime = DateTime.Now.AddHours(i + 1); // Przyjmuję, że chcesz różne daty
-                int randomValue = random.Next(1, 100); // Zakres losowych wartości (możesz dostosować)
 
-                extremeSensorDataCount.Add(randomDateTime, randomValue);
-            }*/
-            // Wywołaj funkcję do pobrania danych i ustawienia adaptera
             UpdateListView();
             LoadChartDataAsync(chartView);
             LoadOtherChartDataAsync(chartView2);
-
 
             return view;
         }
@@ -85,61 +76,25 @@ namespace SenMonitorowanie
             List<Tuple<DateTime, double>> extremeHeartRates = await Task.Run(() => _databaseManager.GetExtremeHeartRatesFromTable(i));
             daneList = _databaseManager.GetLast60DaneSnow();
             long poczatekSekundy = extremeHeartRates[0].Item1.Ticks / TimeSpan.TicksPerSecond;
-
-
             DateTime poczatekCzasuUnixowego = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
 
             // Obliczanie czasu względnego dla każdego elementu w liście
             extremeHeartRates = extremeHeartRates.Select(t => new Tuple<DateTime, double>(poczatekCzasuUnixowego.AddSeconds((t.Item1.Ticks / TimeSpan.TicksPerSecond) - poczatekSekundy), t.Item2)).ToList();
 
-            // Display chart
             DisplayChart(chartView, extremeHeartRates);
         }
 
         private async void LoadOtherChartDataAsync(ChartView chartView, int i = 0)
         {
-
-
-            int iloscRuchow = 0;
-            foreach (var entry in extremeSensorDataCount)
-            {
-                Console.WriteLine($"Hour: {entry.Key}, Count: {entry.Value}"); 
-                iloscRuchow += entry.Value;    // ilość wszystkich ruchów
-            }
-            // Process and transform data if needed
             DisplayOtherChart(chartView, extremeSensorDataCount);
         }
 
         private void UpdateListView()
         {
-            // Tutaj dostarcz swój DatabaseManager (przykładowo za pomocą konstruktora lub wstrzykiwania zależności)
-
-
             daneList = _databaseManager.GetLast60DaneSnow();
             CustomAdapter adapter = new CustomAdapter(_databaseManager, daneList);
             listView.Adapter = adapter;
 
-            adapter.NotifyDataSetChanged();
-
-            // Przetwórz dane na odpowiedni format stringa i dodaj do adaptera
-            //adapter.Add($"{"Data",-6}  {"Długość",3}  {"Ocena",-5}");
-
-           /* foreach (var dane in daneList)
-            {
-                int dokładnyCzas = dane.CzasTrwania;
-                TimeSpan czasTrwania = TimeSpan.FromSeconds(dokładnyCzas);
-                string koncowyCzasTrwania = $"{(int)czasTrwania.TotalHours}:{czasTrwania.Minutes:D2}";
-                Console.WriteLine("Czas Poczatku: " + dane.CzasPoczatku);
-                Console.WriteLine("Czas Zakończenia: " + dane.CzasZakonczenia);
-
-                string formattedData = $"📆: {dane.Data.Substring(5, dane.Data.Length - 8)} \n🕒: {koncowyCzasTrwania}h \nOcena: {dane.Ocena}" +
-                    $"\n❤️ średnie: {dane.AvgHeartRate} \n❤️ max: {dane.MaxHeartRate}\n❤️ min: {dane.MinHeartRate} \nIlość ruchów: {dane.MoveCount}\n💡średnie: {dane.AvgLight}" +// < 200 For an optimal sleep environment, light intensity should be below 200 lux 
-                    $"\n🌡️ min : {dane.MinTemp}\n🌡️ max: {dane.MaxTemp}\n🌡️ średnia: {dane.AvgTemp}";
-                adapter.Add(formattedData);
-            }*/
-
-            // Powiadom adapter o zmianach
             adapter.NotifyDataSetChanged();
         }
 
@@ -186,7 +141,6 @@ namespace SenMonitorowanie
             var entries = new List<ChartEntry>();
             int labelInterval = data.Count < 8 ? 7 : data.Count / 8; // Wybierz co ile punktów wyświetlić etykietę
 
-
             for (int i = 0; i < data.Count; i++)
             {
                 var tuple = data[i];
@@ -198,18 +152,11 @@ namespace SenMonitorowanie
                     ValueLabel = i % labelInterval == 0 ? intValue.ToString() : string.Empty,
                     Color = SKColor.Parse("#FF1493"),
                 }); 
-
             }
 
             var chart = new LineChart { Entries = entries };
-            //chart.LabelOrientation = Microcharts.Orientation.Horizontal;
-
             chartView.Chart = chart;
-
-        }
-
-
-
+            }
     }
 
     public class BazaSnowData
@@ -242,9 +189,7 @@ namespace SenMonitorowanie
         }
 
         public override int Count => _data.Count;
-
         public override BazaSnowData this[int position] => _data[position];
-
         public override long GetItemId(int position) => position;
 
         public override View GetView(int position, View convertView, ViewGroup parent)
@@ -276,7 +221,6 @@ namespace SenMonitorowanie
 
             SetGradientBackground(view, position);
 
-
             return view;
         }
 
@@ -299,15 +243,10 @@ namespace SenMonitorowanie
                 colorSets[colorSetIndex]);
 
             // Ustaw zaokrąglenie narożników (opcjonalne)
-            gradient.SetCornerRadius(0f);
+            gradient.SetCornerRadius(30f);
 
             // Ustaw gradient jako tło widoku
             view.Background = gradient;
         }
-
-
     }
-
-
-
 }

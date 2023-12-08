@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Android.App;
 using Android.Widget;
 using Android.OS;
@@ -15,6 +14,8 @@ using AndroidX.AppCompat.Widget;
 using Android.Content;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Xamarin.Essentials;
+
 
 namespace SenMonitorowanie
 {
@@ -24,14 +25,8 @@ namespace SenMonitorowanie
 
         private SensorManager _sensorManager;
         private DatabaseManager _databaseManager;
-
-       // private TextView _accelerometerDataTextView;
-        // private TextView _volumeLevelTextView;
-        //private TextView _heartRateTextView; // Deklaracja TextView dla tętna
         private AccelerometerHandler _accelerometerHandler;
-        //private AudioRecorder _audioRecorder;
-        private HeartRateSensorHandler _heartRateSensorHandler; // Dodanie obsługi czujnika tętna
-       // private GyroscopeSensorHandler _gyroscopeSensorHandler;
+        private HeartRateSensorHandler _heartRateSensorHandler; 
         private AmbientTemperatureSensorHandler _ambient;
         private LightSensorHandler _light;
 
@@ -39,9 +34,8 @@ namespace SenMonitorowanie
 
         private DateTime startTime;
         DateTime startDate = DateTime.Today;
-
         public bool IsMonitoring = false;
-        //private Button mainMonitoringButton;
+        const int BODY_SENSORS_PERMISSION_REQUEST_CODE = 2;
 
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -52,69 +46,48 @@ namespace SenMonitorowanie
 
             _sensorManager = (SensorManager)GetSystemService(SensorService);
             _databaseManager = new DatabaseManager(this);
-
-            //_accelerometerDataTextView = FindViewById<TextView>(Resource.Id.accelerometerDataTextView);
-            // _volumeLevelTextView = FindViewById<TextView>(Resource.Id.volumeLevelTextView);
-            //_heartRateTextView = FindViewById<TextView>(Resource.Id.txtHeartRate); // Inicjalizacja TextView dla tętna
-
-          _accelerometerHandler = new AccelerometerHandler(_sensorManager, _databaseManager);
-           //_audioRecorder = new AudioRecorder(_volumeLevelTextView);
-          _heartRateSensorHandler = new HeartRateSensorHandler(_sensorManager, _databaseManager); // Inicjalizacja obsługi czujnika tętna
-         //_gyroscopeSensorHandler = new GyroscopeSensorHandler(_sensorManager, _databaseManager);
+            _accelerometerHandler = new AccelerometerHandler(_sensorManager);
+            _heartRateSensorHandler = new HeartRateSensorHandler(_sensorManager); 
             _ambient = new AmbientTemperatureSensorHandler(_sensorManager);
             _light = new LightSensorHandler(_sensorManager);
+
             SetAmbientEnabled();
 
             FragmentManager fragmentManager = FragmentManager;
-
             // Rozpoczęcie transakcji fragmentu
             FragmentTransaction fragmentTransaction = fragmentManager.BeginTransaction();
-
             // Zastąpienie istniejącego fragmentu nowym fragmentem
             fragmentTransaction.Replace(Resource.Id.fragment_container, new monitoringScreen());
-
             // Dodanie transakcji do back stack (aby można było wrócić do poprzedniego fragmentu przyciskiem "Back")
             fragmentTransaction.AddToBackStack(null);
-
             // Zatwierdzenie transakcji
             fragmentTransaction.Commit();
 
-
-
-
-
             SetupFloatingActionButtonMenu();
-
-
-            
         }
         private readonly object databaseLock = new object();
 
         Task HandleTimerAsync()
         {
-            Console.WriteLine("Interval Called");
-
             List<float> accelerometerData = _accelerometerHandler.GetAccelerometerData();
             float heartRateData = _heartRateSensorHandler.getActualData();
-            //List<float> gyroscopeData = _gyroscopeSensorHandler.GetGyroscopeData();
             float temperatura = _ambient.GetAmbientTemperatureData();
             float swiatelko = _light.GetLightSensorData();
-
             DateTime currentDate = DateTime.Now;
             string collectionTime = currentDate.ToString("yyyy-MM-dd H:mm:ss");
-            // Console.WriteLine(_databaseManager.GetLatestDane("DaneSensorowe", "heart_rate"));
 
-            //foreach (List<float> data in accelerometerData)
-            //{
+
             lock (databaseLock){
-                Console.WriteLine($"Data pobrania : {collectionTime} AX: {accelerometerData[0]}, AY: {accelerometerData[1]}, AZ: {accelerometerData[2]}, heart: {heartRateData}");
-                Console.WriteLine($"Poziom temperatury: {temperatura} Poziom światła: {swiatelko}");
-                _databaseManager.InsertDaneSensorowe(collectionTime, accelerometerData[0], accelerometerData[1], accelerometerData[2], heartRateData, temperatura, swiatelko);
+                _databaseManager.InsertDaneSensorowe(
+                    collectionTime, 
+                    accelerometerData[0], 
+                    accelerometerData[1], 
+                    accelerometerData[2], 
+                    heartRateData, 
+                    temperatura, 
+                    swiatelko
+                );
             }
-            //_databaseManager.InsertDaneSensorowe();
-            //}
-            // Your async logic here.
-            //Console.WriteLine($"MAX heartate: {_databaseManager.GetMaxHeartRate()} MIN heartate: {_databaseManager.GetMinHeartRate()} AVG heartate: {_databaseManager.GetAverageHeartRate()}");
 
             return Task.CompletedTask;
         }
@@ -123,20 +96,20 @@ namespace SenMonitorowanie
 
         public void StartSleepMonitoring()
         {
-            _databaseManager.ClearAllDaneSensoroweData();
+            _databaseManager.ClearTable("DaneSensorowe");
+
+            CheckAndRequestBodySensorsPermission();
+
 
             var serviceIntent = new Intent(this, typeof(MyBackgroundService));
             StartService(serviceIntent);
-            // Start listening to sensors
+
             _accelerometerHandler.StartListening();
-            //_audioRecorder.StartRecording();
             _heartRateSensorHandler.StartListening();
-            //_gyroscopeSensorHandler.StartListening();
             _ambient.StartListening();
             _light.StartListening();
+
             startTime = DateTime.Now;
-
-
 
             if (isTimerRunning && timer != null)
             {
@@ -165,6 +138,8 @@ namespace SenMonitorowanie
                 int identyfikatorMierzenia = _databaseManager.GetMaxIdentifikator();
                 _databaseManager.InsertExtremeSensorDataToTable(identyfikatorMierzenia+1);
                 _databaseManager.InsertExtremeHeartRatesToTable(identyfikatorMierzenia+1);
+                _databaseManager.ClearWykresTable();
+                _databaseManager.ClearWykresTable("DaneSerca", "Identifikator");
 
                 string currentDateAsString = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 TimeSpan duration = DateTime.Now - startTime;
@@ -173,106 +148,96 @@ namespace SenMonitorowanie
                 int startTimeInSeconds = (int)(startTime - startDate).TotalSeconds;
                 int currentTimeInSeconds = (int)(DateTime.Now - startDate).TotalSeconds;
 
-
-                Console.WriteLine($"MAX heartate: {_databaseManager.GetMax("heart_rate")} MIN heartate: {_databaseManager.GetMin("heart_rate")} AVG heartate: {_databaseManager.GetAverage("heart_rate")}");
-                Console.WriteLine($"MAX temperature : {_databaseManager.GetMax("temperature ")} MIN temperature : {_databaseManager.GetMin("temperature ")} AVG temperature : {_databaseManager.GetAverage("temperature ")}");
-                Console.WriteLine($"AVG light : {_databaseManager.GetAverage("light")}");
                 Dictionary<DateTime, int> extremeSensorDataCount = _databaseManager.GetExtremeSensorDataCountPerHour();
                 int iloscRuchow = 0;
 
                 foreach (var entry in extremeSensorDataCount)
                 {
-                    Console.WriteLine($"Hour: {entry.Key}, Count: {entry.Value}"); /// dzielić przez 2 ilośc ruchów?????????
                     iloscRuchow += entry.Value;    // ilość wszystkich ruchów
                 }
 
-                _databaseManager.InsertDaneSnow(currentDateAsString, seconds, ocenkaSnu, startTimeInSeconds, currentTimeInSeconds,
-                    (float)_databaseManager.GetAverage("heart_rate"), (float)_databaseManager.GetMax("heart_rate"),
-                    (float)_databaseManager.GetMin("heart_rate"), iloscRuchow, (float)_databaseManager.GetMin("temperature "),
-                    (float)_databaseManager.GetMax("temperature "), (float)_databaseManager.GetAverage("temperature"), (float)_databaseManager.GetAverage("light")
+                _databaseManager.InsertDaneSnow(
+                    currentDateAsString, 
+                    seconds, 
+                    ocenkaSnu, 
+                    startTimeInSeconds, 
+                    currentTimeInSeconds,
+                    (float)_databaseManager.GetAverage("heart_rate"), 
+                    (float)_databaseManager.GetMax("heart_rate"),
+                    (float)_databaseManager.GetMin("heart_rate"), 
+                    iloscRuchow, 
+                    (float)_databaseManager.GetMin("temperature "),
+                    (float)_databaseManager.GetMax("temperature "), 
+                    (float)_databaseManager.GetAverage("temperature"), 
+                    (float)_databaseManager.GetAverage("light")
                 );
-
-
-                // List<Tuple<System.DateTime, double>> extremeHeartRates = _databaseManager.GetExtremeHeartRatesWithDate();
-                // _databaseManager.SaveExtremeHeartRatesToDatabase(extremeHeartRates);
-                /*
-                 foreach (var data in extremeHeartRates)
-                 {
-                     System.DateTime id = data.Item1;
-                     double smoothedHeartRate = data.Item2;
-                     Console.WriteLine($"data wystąpienia to: {data.Item1}, a dane serca to {smoothedHeartRate}");
-
-                 }*/
-
-
 
 
                 _accelerometerHandler.StopListening();
                 _heartRateSensorHandler.StopListening();
-                //_gyroscopeSensorHandler.StopListening();
                 _ambient.StopListening();
                 _light.StopListening();
 
                 var serviceIntent = new Intent(this, typeof(MyBackgroundService));
                 StopService(serviceIntent);
 
-
-                _databaseManager.ClearAllDaneSensoroweData();
-
+                _databaseManager.ClearTable("DaneSensorowe");
             }
         }
-
-
 
         protected override void OnResume()
         {
             base.OnResume();
-
-            
-            //_accelerometerHandler.StartListening();
-            // _audioRecorder.StartRecording();
-           // _heartRateSensorHandler.StartListening(); // Rozpocznij nasłuchiwanie czujnika tętna
         }
 
         protected override void OnPause()
         {
             base.OnPause();
-
-           //_accelerometerHandler.StopListening();
-            // _audioRecorder.StopRecording();
-           // _heartRateSensorHandler.StopListening(); // Zatrzymaj nasłuchiwanie czujnika tętna
-            //_gyroscopeSensorHandler.StopListening();
-
         }
 
         protected override void OnDestroy()
         {
-            // Stop the background service
-            
-
+            StopBackgroundService();
             base.OnDestroy();
+        }
+
+        private void StopBackgroundService()
+        {
+            Intent serviceIntent = new Intent(this, typeof(MyBackgroundService));
+            StopService(serviceIntent);
         }
 
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+        async void CheckAndRequestBodySensorsPermission()
+        {
+            var status = await Permissions.CheckStatusAsync<Permissions.Sensors>();
+
+            if (status != PermissionStatus.Granted)
+            {
+                var result = await Permissions.RequestAsync<Permissions.Sensors>();
+
+                if (result != PermissionStatus.Granted)
+                {
+                    // Użytkownik nie udzielił zgody na dostęp do czujników na ciele
+                    // Tutaj możesz obsłużyć sytuację, gdy użytkownik nie udzielił zgody
+                }
+            }
         }
 
 
         private void SetupFloatingActionButtonMenu()
         {
             var fab = FindViewById<AppCompatImageButton>(Resource.Id.fab);
-
             bool isMenuOpen = false; // Zmienna śledząca stan menu
-
 
             fab.Click += (sender, e) =>
             {
-                //Console.WriteLine(_heartRateTextView.Text);
-
                 fab.Animate().Alpha(0.0f).SetDuration(300);
                 if (!isMenuOpen) // Jeśli menu jest zamknięte
                 { // Ładuj niestandardowy widok z menu XML
@@ -280,8 +245,6 @@ namespace SenMonitorowanie
                     PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
                     ViewHelper.SetFontForAllViews(popupView, this);
 
-
-                    
                     popupWindow.ShowAtLocation(fab, GravityFlags.CenterHorizontal, 0, 0);
 
                     // Przygotowanie popupView do animacji początkowej
@@ -302,7 +265,7 @@ namespace SenMonitorowanie
                             .ScaleY(1.0f)
                             .TranslationX(0)
                             .TranslationY(0)
-                            .SetDuration(300); // Wydłuż czas trwania animacji na 1 sekundę
+                            .SetDuration(300); // Wydłuż czas trwania animacji
 
                     // Dodanie efektu spowolnienia (jedno odbicie)
                     animator.SetInterpolator(new DecelerateInterpolator());
@@ -321,34 +284,21 @@ namespace SenMonitorowanie
                     {
                         // Pobieranie menedżera fragmentów
                         FragmentManager fragmentManager = FragmentManager;
-
                         // Rozpoczęcie transakcji fragmentu
                         FragmentTransaction fragmentTransaction = fragmentManager.BeginTransaction();
-
                         // Zastąpienie istniejącego fragmentu nowym fragmentem
                         fragmentTransaction.Replace(Resource.Id.fragment_container, fragment);
-
                         // Dodanie transakcji do back stack (aby można było wrócić do poprzedniego fragmentu przyciskiem "Back")
                         fragmentTransaction.AddToBackStack(null);
-
                         // Zatwierdzenie transakcji
                         fragmentTransaction.Commit();
-
                         // Możesz dodać tutaj dodatkowe operacje związane z zamknięciem menu kontekstowego i animacjami, jeśli są potrzebne
                         popupWindow.Dismiss();
                         fab.Animate().Alpha(1.0f).SetDuration(00);
                         isMenuOpen = false;
                     }
-
-                    
-
-
-
                 }
             };
-
         }
     }
 }
-
-
