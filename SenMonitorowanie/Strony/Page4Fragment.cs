@@ -36,8 +36,7 @@ namespace SenMonitorowanie
             listView = view.FindViewById<ListView>(Resource.Id.wypisDanych);
             adapter = new ArrayAdapter<string>(Activity, Android.Resource.Layout.SimpleListItem1);
             listView.Adapter = adapter;
-            iloscDanych = _databaseManager.GetDistinctIdentifiersCount() > 8 ? 8 : _databaseManager.GetDistinctIdentifiersCount();
-            Console.WriteLine(_databaseManager.GetDistinctIdentifiersCount());
+            iloscDanych = Math.Min(_databaseManager.GetDistinctIdentifiersCount(), 8);
             ChartView chartView = view.FindViewById<ChartView>(Resource.Id.chartView);
             ChartView chartView2 = view.FindViewById<ChartView>(Resource.Id.chartView2);
 
@@ -45,12 +44,21 @@ namespace SenMonitorowanie
 
             Button wyborDnia = view.FindViewById<Button>(Resource.Id.wyborDnia);
 
-            wyborDnia.Click += (sender, e) => {
-                string[] tablicaDni = { "Ostanie mierzenie", "Przedstanie mierzenie", "2 mierzenia temu", "3 mierzenia temu" , "4 mierzenia temu" , "5 mierzeń temu", "6 mierzeń temu", "7 mierzeń temu" };
+            wyborDnia.Click += async (sender, e) => {
+                string[] tablicaMierzen = { 
+                    "Ostanie mierzenie", 
+                    "Przedstanie mierzenie", 
+                    "2 mierzenia temu", 
+                    "3 mierzenia temu" , 
+                    "4 mierzenia temu" , 
+                    "5 mierzeń temu", 
+                    "6 mierzeń temu", 
+                    "7 mierzeń temu" 
+                };
                 kolejnyDzien++;
                 if (iloscDanych != 0)
                 {
-                    wyborDnia.Text = tablicaDni[kolejnyDzien % iloscDanych];
+                    wyborDnia.Text = tablicaMierzen[kolejnyDzien % iloscDanych];
                     extremeSensorDataCount = _databaseManager.GetIloscRuchowDataPerHour(kolejnyDzien % iloscDanych);
 
                     LoadChartDataAsync(chartView, kolejnyDzien % iloscDanych);
@@ -59,8 +67,10 @@ namespace SenMonitorowanie
             };
 
             UpdateListView();
+
             LoadChartDataAsync(chartView);
             LoadOtherChartDataAsync(chartView2);
+            
 
             return view;
         }

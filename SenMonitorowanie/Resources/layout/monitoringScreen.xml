@@ -39,7 +39,8 @@
              android:background="@drawable/main_button"
             android:layout_centerHorizontal="true"
             android:text="Start Mierzenia Snu"
-            android:textSize="18dp" />
+            android:textSize="18dp" 
+            />
 
     </LinearLayout>
     

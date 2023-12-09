@@ -1,0 +1,32 @@
+﻿<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?android:attr/colorControlHighlight">
+	<item android:id="@android:id/background">
+		<selector>
+			<!-- Pressed State -->
+			<item android:state_pressed="true">
+				<shape android:shape="rectangle">
+					<corners android:radius="0dip" />
+					<stroke android:width="1dip" android:color="#1AACAC" />
+					<gradient android:angle="-90" android:startColor="#362FD9" android:endColor="#2E97A7" />
+				</shape>
+			</item>
+			<!-- Focused State -->
+			<item android:state_focused="true">
+				<shape android:shape="rectangle">
+					<corners android:radius="0dip" />
+					<stroke android:width="1dip" android:color="#2E97A7" />
+					<solid android:color="#1AACAC" />
+				</shape>
+			</item>
+			<!-- Default State -->
+			<item>
+				<shape android:shape="rectangle">
+					<corners android:radius="0dip" />
+					<stroke android:width="1dip" android:color="#2E97A7" />
+					<gradient android:angle="-15" android:centerX="35%" android:centerColor="#ED5AB3"
+                        android:startColor="#FF90C2" android:endColor="#001B79" android:type="linear" />
+				</shape>
+			</item>
+		</selector>
+	</item>
+</ripple>
