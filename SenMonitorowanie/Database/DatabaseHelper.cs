@@ -16,7 +16,7 @@ namespace SenMonitorowanie
         public override void OnCreate(SQLiteDatabase db)
         {
             // Tworzenie tabeli SensorData, jeśli nie istnieje
-            db.ExecSQL("CREATE TABLE IF NOT EXISTS SensorData (Id INTEGER PRIMARY KEY, Data TEXT)");
+            //db.ExecSQL("CREATE TABLE IF NOT EXISTS SensorData (Id INTEGER PRIMARY KEY, Data TEXT)");
 
             // Tworzenie tabeli BazaSnow, jeśli nie istnieje
             db.ExecSQL("CREATE TABLE IF NOT EXISTS BazaSnow (Id INTEGER PRIMARY KEY, Data TEXT, CzasPoczatku INTEGER, CzasZakonczenia INTEGER, CzasTrwania INTEGER, Ocena INTEGER, avg_heart_rate REAL, max_hear_rate REAL, min_heart_rate REAL, move_count INTEGER, min_temp REAL, max_temp REAL, avg_temp REAL, avg_light REAL)");

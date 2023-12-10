@@ -17,7 +17,7 @@ namespace SenMonitorowanie
     public class Page4Fragment : Fragment
     {
         private ListView listView;
-        private ArrayAdapter<string> adapter; // Zmiana typu adaptera na ArrayAdapter<string>
+        private ArrayAdapter<string> adapter; 
         private DatabaseManager _databaseManager;
         List<BazaSnowData> daneList;
         Dictionary<DateTime, int> extremeSensorDataCount;
@@ -204,7 +204,7 @@ namespace SenMonitorowanie
             List<(int, Func<BazaSnowData, string>)> textViewMappings = new List<(int, Func<BazaSnowData, string>)>
             {
                 (Resource.Id.textViewData, dataItem => $"📆: {dataItem.Data.Substring(5, dataItem.Data.Length - 8)}"),
-                (Resource.Id.listaOcena, dataItem => $"Ocena: {dataItem.Ocena}"),
+                (Resource.Id.listaOcena, dataItem => $"Ocena: {dataItem.Ocena}/12"),
                 (Resource.Id.lista_min_heart, dataItem => $"💙 min: {Convert.ToInt32(dataItem.MinHeartRate)}"),
                 (Resource.Id.lista_max_heart, dataItem => $"💚 max: {Convert.ToInt32(dataItem.MaxHeartRate)}"),
                 (Resource.Id.lista_avg_heart, dataItem => $"💖 średnie: {Convert.ToInt32(dataItem.AvgHeartRate)}"),

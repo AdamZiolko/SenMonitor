@@ -209,6 +209,34 @@ namespace SenMonitorowanie
             }
         }
 
+        public void KeepLatestRecords(string tabela = "BazaSnow", int limit = 30)
+        {
+            using (SQLiteDatabase db = _databaseHelper.WritableDatabase)
+            {
+                db.BeginTransaction();
+
+                try
+                {
+                    // Keep only the latest 'limit' records in the table
+                    db.ExecSQL($"DELETE FROM {tabela} WHERE Id NOT IN (SELECT Id FROM {tabela} ORDER BY Id DESC LIMIT {limit});");
+
+                    // Set the transaction as successful
+                    db.SetTransactionSuccessful();
+                }
+                catch (Exception ex)
+                {
+                    // Handle any exceptions that may occur during the transaction
+                    Console.WriteLine($"Error keeping latest records in {tabela} table: {ex.Message}");
+                }
+                finally
+                {
+                    // End the transaction
+                    db.EndTransaction();
+                }
+            }
+        }
+
+
         public double GetMax(string zmienna)
         {
             using (SQLiteDatabase db = _databaseHelper.ReadableDatabase)
@@ -280,8 +308,14 @@ namespace SenMonitorowanie
                     "    ((sd.smoothed_heart_rate >= (SELECT smoothed_heart_rate FROM SmoothedData WHERE id = sd.id - 1)) AND " +
                     "     (sd.smoothed_heart_rate > (SELECT smoothed_heart_rate FROM SmoothedData WHERE id = sd.id + 1))) " +
                     "    OR " +
+                    "    ((sd.smoothed_heart_rate > (SELECT smoothed_heart_rate FROM SmoothedData WHERE id = sd.id - 1)) AND " +
+                    "     (sd.smoothed_heart_rate >= (SELECT smoothed_heart_rate FROM SmoothedData WHERE id = sd.id + 1))) " +
+                    "    OR " +
                     "    ((sd.smoothed_heart_rate <= (SELECT smoothed_heart_rate FROM SmoothedData WHERE id = sd.id - 1)) AND " +
                     "     (sd.smoothed_heart_rate < (SELECT smoothed_heart_rate FROM SmoothedData WHERE id = sd.id + 1))) " +
+                    "    OR " +
+                    "    ((sd.smoothed_heart_rate < (SELECT smoothed_heart_rate FROM SmoothedData WHERE id = sd.id - 1)) AND " +
+                    "     (sd.smoothed_heart_rate <= (SELECT smoothed_heart_rate FROM SmoothedData WHERE id = sd.id + 1))) " +
                     "ORDER BY sd.id";
 
                 using (var cursor = db.RawQuery(query, null))

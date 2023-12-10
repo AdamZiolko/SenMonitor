@@ -17,7 +17,7 @@ using Xamarin.Essentials;
 namespace SenMonitorowanie
 {
     [Activity(Label = "SenMonitor", MainLauncher = true)]
-    public class MainActivity : WearableActivity//, BottomNavigationView.IOnNavigationItemSelectedListener
+    public class MainActivity : WearableActivity
     {
 
         private SensorManager _sensorManager;
@@ -193,6 +193,7 @@ namespace SenMonitorowanie
                 var serviceIntent = new Intent(this, typeof(MyBackgroundService));
                 StopService(serviceIntent);
 
+                _databaseManager.KeepLatestRecords();
                 _databaseManager.ClearTable("DaneSensorowe");
             }
         }
