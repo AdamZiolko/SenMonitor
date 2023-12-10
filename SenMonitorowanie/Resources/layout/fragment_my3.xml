@@ -49,8 +49,21 @@
             android:textSize="12dp"        
             android:text="Ostatnie mierzenie" />
 
+        <TextView
+            android:id="@+id/wykresiek"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:textSize="13dp"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="5dp"
+            android:text="Wykres zmiany tętna:"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"/>
+
         <LinearLayout
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="9dp"
             android:id="@+id/firstLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="150dp"
@@ -69,8 +82,21 @@
 
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/wykresieek"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:textSize="13dp"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="10dp"
+            android:text="Wykres ilości ruchów na godzinę:"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"/>
         <LinearLayout
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:id="@+id/secondLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="160dp"

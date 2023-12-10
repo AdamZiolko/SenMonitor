@@ -12652,13 +12652,19 @@ namespace SenMonitorowanie
 			public const int wyborDnia = 2131362418;
 			
 			// aapt resource value: 0x7F0A0273
-			public const int wypisDanych = 2131362419;
+			public const int wykresieek = 2131362419;
 			
 			// aapt resource value: 0x7F0A0274
-			public const int x_left = 2131362420;
+			public const int wykresiek = 2131362420;
 			
 			// aapt resource value: 0x7F0A0275
-			public const int x_right = 2131362421;
+			public const int wypisDanych = 2131362421;
+			
+			// aapt resource value: 0x7F0A0276
+			public const int x_left = 2131362422;
+			
+			// aapt resource value: 0x7F0A0277
+			public const int x_right = 2131362423;
 			
 			static Id()
 			{
