@@ -6,26 +6,26 @@
 			<!-- Pressed State -->
 			<item android:state_pressed="true">
 				<shape android:shape="rectangle">
-					<corners android:radius="0dip" />
+					<corners android:radius="5dip" />
 					<stroke android:width="1dip" android:color="#000000" />
-					<gradient android:angle="-90" android:startColor="#aa076b" android:endColor="#61045f" />
+					<gradient android:angle="-90" android:startColor="#c31432" android:endColor="#240b36" />
 				</shape>
 			</item>
 			<!-- Focused State -->
 			<item android:state_focused="true">
 				<shape android:shape="rectangle">
-					<corners android:radius="0dip" />
+					<corners android:radius="5dip" />
 					<stroke android:width="1dip" android:color="#136a8a
 " />
-					<solid android:color="#aa076b" />
+					<solid android:color="#c31432" />
 				</shape>
 			</item>
 			<!-- Default State -->
 			<item>
 				<shape android:shape="rectangle">
-					<corners android:radius="0dip" />
+					<corners android:radius="5dip" />
 					<stroke android:width="1dip" android:color="#000000" />
-					<gradient android:angle="-90" android:startColor="#159957"  android:endColor="#155799" />
+					<gradient android:angle="-90" android:startColor="#ff0099"  android:endColor="#493240" />
 				</shape>
 			</item>
 		</selector>
