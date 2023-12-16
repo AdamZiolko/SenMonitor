@@ -32,7 +32,7 @@ namespace SenMonitorowanie
         private DateTime startTime;
         DateTime startDate = DateTime.Today;
         public bool IsMonitoring = false;
-
+        private int numberOfIterations = 5400;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -71,7 +71,7 @@ namespace SenMonitorowanie
             float swiatelko = _light.GetLightSensorData();
             DateTime currentDate = DateTime.Now;
             string collectionTime = currentDate.ToString("yyyy-MM-dd H:mm:ss");
-
+            --numberOfIterations;
 
             lock (databaseLock){
                 _databaseManager.InsertDaneSensorowe(
@@ -85,7 +85,13 @@ namespace SenMonitorowanie
                 );
             }
 
-            return Task.CompletedTask;
+            if (numberOfIterations == 0)
+            {
+                numberOfIterations = 5400;
+                StopSleepMonitoring();
+            }
+
+                return Task.CompletedTask;
         }
 
         private bool isTimerRunning = false;

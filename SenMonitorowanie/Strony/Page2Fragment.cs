@@ -72,11 +72,13 @@ namespace SenMonitorowanie
             );
 
             _databaseManager.InsertDaneSnow(formattedDate, czaswSekundach, ocenaSnu, czasPoczatku, czasZakonczenia);
+            _databaseManager.KeepLatestRecords();
 
             TimeSpan czasTrwania = TimeSpan.FromSeconds(czaswSekundach);
             string koncowyCzasTrwania = $"{(int)czasTrwania.TotalHours}:{czasTrwania.Minutes:D2}";
             string timeMessage = $"Suma godzin: {koncowyCzasTrwania}";
             Toast.MakeText(Context, timeMessage, ToastLength.Short).Show();
+
         }
     }
 }
