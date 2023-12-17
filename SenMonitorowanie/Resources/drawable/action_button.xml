@@ -4,7 +4,7 @@
 
     <item android:id="@android:id/background">
         <selector>
-            <!-- Pressed State -->
+            <!-- Stan wciśnięcia -->
             <item android:state_pressed="true">
                 <layer-list>
                     <!-- Warstwa tła przycisku z animacją ripple -->
@@ -26,7 +26,7 @@
                     </item>
                 </layer-list>
             </item>
-            <!-- Focused State -->
+            <!-- Stan sfokusowany -->
             <item android:state_focused="true">
                 <shape android:shape="rectangle">
                     <corners android:radius="25dip" />
@@ -34,7 +34,7 @@
                     <solid android:color="#0083b0" />
                 </shape>
             </item>
-            <!-- Default State -->
+            <!-- Domyslny stan -->
             <item>
                 <layer-list>
                     <!-- Warstwa tła przycisku -->

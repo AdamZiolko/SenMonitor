@@ -2,7 +2,7 @@
     android:color="?android:attr/colorControlHighlight">
 	<item android:id="@android:id/background">
 		<selector>
-			<!-- Pressed State -->
+			<!-- Stan wciśnięty -->
 			<item android:state_pressed="true">
 				<shape android:shape="rectangle">
 					<corners android:radius="0dip" />
@@ -10,7 +10,7 @@
 					<gradient android:angle="-90" android:startColor="#362FD9" android:endColor="#2E97A7" />
 				</shape>
 			</item>
-			<!-- Focused State -->
+			<!-- Stan sfokusowany -->
 			<item android:state_focused="true">
 				<shape android:shape="rectangle">
 					<corners android:radius="0dip" />
@@ -18,7 +18,7 @@
 					<solid android:color="#1AACAC" />
 				</shape>
 			</item>
-			<!-- Default State -->
+			<!-- Domyslny stan -->
 			<item>
 				<shape android:shape="rectangle">
 					<corners android:radius="0dip" />
