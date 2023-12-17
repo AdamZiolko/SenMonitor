@@ -119,8 +119,8 @@ namespace SenMonitorowanie
 
             foreach (var entry in data)
             {
-                int colorIndex = i % colors.Count;
-                entries.Add(new ChartEntry(entry.Value)
+                int colorIndex = i % colors.Count;  
+                entries.Add(new ChartEntry(entry.Value)  
                 {
                     Label = i % labelInterval == 0 ? entry.Key.ToString("HH:mm") : string.Empty,
                     ValueLabel = i % labelInterval == 0 ? entry.Value.ToString() : string.Empty,
@@ -146,7 +146,7 @@ namespace SenMonitorowanie
             var entries = new List<ChartEntry>();
             int labelInterval = data.Count < 8 ? 7 : data.Count / 8; // Wybierz co ile punktów wyświetlić etykietę
 
-            for (int i = 0; i < data.Count; i++)
+            for (int i = 0; i < data.Count; i++) 
             {
                 var tuple = data[i];
                 int intValue = (int)tuple.Item2; // Konwersja double na int

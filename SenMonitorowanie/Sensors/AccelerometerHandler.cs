@@ -5,11 +5,11 @@ using System.Collections.Generic;
 public class AccelerometerHandler : Java.Lang.Object, ISensorEventListener
 {
     private SensorManager _sensorManager;
-    private List<float> _accelerometerData; // Change the type to List<List<float>>
+    private List<float> _accelerometerData; // Zmień typ na List<List<float>>
     public AccelerometerHandler(SensorManager sensorManager)
     {
         _sensorManager = sensorManager;
-        _accelerometerData = new List<float>(); // Initialize as a List<List<float>>
+        _accelerometerData = new List<float>(); // Zainicjuj jako List<List<float>>
     }
 
     public void StartListening()
@@ -27,7 +27,7 @@ public class AccelerometerHandler : Java.Lang.Object, ISensorEventListener
         // Zrób coś, gdy zmieni się dokładność czujnika
     }
 
-    public List<float> GetAccelerometerData() // Change the return type
+    public List<float> GetAccelerometerData() // Zmień zwracaną wartość
     {
         return _accelerometerData;
     }

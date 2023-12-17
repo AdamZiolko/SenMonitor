@@ -24,7 +24,8 @@ public class AmbientTemperatureSensorHandler : Java.Lang.Object, ISensorEventLis
 
     public void OnAccuracyChanged(Sensor sensor, [GeneratedEnum] SensorStatus accuracy)
     {
-        // Handling changes in the accuracy of the ambient temperature sensor (optional)
+        //Obsługa zmian dokładności czujnika temperatury otoczenia (opcja)
+
     }
 
     public float GetAmbientTemperatureData()

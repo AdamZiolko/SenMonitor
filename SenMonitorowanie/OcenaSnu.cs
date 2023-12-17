@@ -23,7 +23,7 @@ namespace SenMonitorowanie
             if (poprzedniaOcena >= ocenaSnu) ocenaSnu += 1; // Punkty za utrzymanie oceny snu z dnia poprzedniego
 
             // Dodatkowe kryteria oceny snu
-            if (iloscRuchow <= 55 && iloscRuchow >= 35) ocenaSnu += 2; // The average sleeper moves about 40 to 50 times a night andthis number changes in certain situations. For example, sleep deprivationresults in a sleep with fewer movements.1 kwi 2006
+            if (iloscRuchow <= 55 && iloscRuchow >= 35) ocenaSnu += 2; // Przeciętny śpiący porusza się około 40 do 50 razy w ciągu nocy i liczba ta zmienia się w pewnych sytuacjach. Na przykład brak snu skutkuje mniejszą liczbą ruchów podczas snu.1 kwi 2006
             if (avgTemp >= 15 && avgTemp <= 24) ocenaSnu += 2; // Optymalna średnia temperatura podczas snu (19-21 stopni Celsiusza)
             if (minHeartRate >= 40 && maxHeartRate <= 100) ocenaSnu += 1; // Optymalne tetno podczas snu
             if (avgLight <= 80) ocenaSnu += 2; // Bardzo niskie natężenie światła 
